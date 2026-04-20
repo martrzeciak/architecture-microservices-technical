@@ -1,0 +1,25 @@
+services:
+  product-service:
+    build:
+      context: ./backend/ProductService
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/healthz/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  envoy:
+    image: envoyproxy/envoy:v1.29-latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    depends_on:
+      product-service:
+        condition: service_healthy
