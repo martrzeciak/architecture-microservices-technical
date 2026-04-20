@@ -1,8 +1,8 @@
 services:
   product-service:
     build:
-      context: ./backend/ProductService
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/ProductService/Dockerfile
     ports:
       - "5000:5000"
       - "5001:5001"
