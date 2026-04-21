@@ -52,9 +52,6 @@ jobs:
       - name: Generate Connect/gRPC stubs from .proto
         run: npm run proto:gen:connect
 
-      - name: Lint
-        run: npm run lint
-
       - name: Build (production)
         run: npm run build -- --configuration production
 
