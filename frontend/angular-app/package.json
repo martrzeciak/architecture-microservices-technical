@@ -1,0 +1,59 @@
+{
+  "name": "angular-app",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "proto:gen": "grpc_tools_node_protoc --plugin=protoc-gen-grpc-web=.\\node_modules\\.bin\\protoc-gen-grpc-web.cmd --js_out=import_style=commonjs:.\\src\\generated --grpc-web_out=import_style=typescript,mode=grpcwebtext:.\\src\\generated -I ..\\..\\protos ..\\..\\protos\\product.proto ..\\..\\protos\\order.proto",
+    "proto:gen:connect": ".\\node_modules\\.bin\\grpc_tools_node_protoc.cmd --plugin=protoc-gen-es=.\\node_modules\\.bin\\protoc-gen-es.cmd --es_out=.\\src\\generated-connect --plugin=protoc-gen-connect-es=.\\node_modules\\.bin\\protoc-gen-connect-es.cmd --connect-es_out=.\\src\\generated-connect -I ..\\..\\protos ..\\..\\protos\\product.proto ..\\..\\protos\\order.proto"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/compiler": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/forms": "^20.3.0",
+    "@angular/platform-browser": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "@bufbuild/protobuf": "^1.10.1",
+    "@connectrpc/connect": "^1.7.0",
+    "@connectrpc/connect-web": "^1.7.0",
+    "google-protobuf": "^3.21.4",
+    "grpc-web": "^1.5.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.24",
+    "@angular/cli": "^20.3.24",
+    "@angular/compiler-cli": "^20.3.0",
+    "@bufbuild/protoc-gen-es": "^1.10.1",
+    "@connectrpc/protoc-gen-connect-es": "^1.7.0",
+    "@types/google-protobuf": "^3.15.12",
+    "@types/jasmine": "~5.1.0",
+    "grpc-tools": "^1.13.1",
+    "jasmine-core": "~5.9.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "protoc-gen-grpc-web": "^1.5.0",
+    "typescript": "~5.9.2"
+  }
+}

@@ -6,6 +6,7 @@ services:
     ports:
       - "5000:5000"
       - "5001:5001"
+      - "5002:5002"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     healthcheck:

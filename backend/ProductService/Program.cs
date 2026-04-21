@@ -4,16 +4,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddGrpc();
 builder.Services.AddHealthChecks();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5000);
     options.ListenAnyIP(5001, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2);
+    // Port 5002: Http1AndHttp2 dla bezpośredniego gRPC-Web z przeglądarki (bez Envoy proxy)
+    options.ListenAnyIP(5002, o => o.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2);
 });
 
 var app = builder.Build();
 
-app.MapGrpcService<ProductGrpcService>();
+app.UseCors();
+app.UseGrpcWeb(); // Translacja gRPC-Web (HTTP/1.1) → gRPC (HTTP/2) bezpośrednio w .NET
+app.MapGrpcService<ProductGrpcService>().EnableGrpcWeb();
 
 app.MapHealthChecks("/healthz/live");
 app.MapHealthChecks("/healthz/ready");

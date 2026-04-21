@@ -13,8 +13,12 @@ public class ProductGrpcService : EShop.ProductService.ProductService.ProductSer
         new Product { Id = "4", Name = "USB-C Hub", Description = "7-in-1 USB-C hub", Price = 39.99, CategoryId = "electronics", Stock = 200 },
         new Product { Id = "5", Name = "Monitor 27\"", Description = "4K IPS display 27 inch", Price = 599.99, CategoryId = "electronics", Stock = 25 },
     ];
+    private static readonly Lock _lock = new();
 
-    public static IEnumerable<Product> GetProducts() => _products;
+    public static IEnumerable<Product> GetProducts()
+    {
+        lock (_lock) { return _products.ToList(); }
+    }
 
     public static Product AddProduct(string name, string description, double price, string categoryId, int stock)
     {
@@ -27,7 +31,7 @@ public class ProductGrpcService : EShop.ProductService.ProductService.ProductSer
             CategoryId = categoryId,
             Stock = stock,
         };
-        _products.Add(product);
+        lock (_lock) { _products.Add(product); }
         return product;
     }
 

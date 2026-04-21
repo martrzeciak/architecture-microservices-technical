@@ -1,0 +1,20 @@
+import { HttpInterceptorFn } from '@angular/common/http';
+
+/**
+ * JWT auth interceptor — szkielet.
+ * Dodaje token Bearer do każdego żądania HTTP (REST).
+ * Dla gRPC metadata dodawana jest w GrpcProductService.
+ */
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = localStorage.getItem('access_token');
+
+  if (!token) {
+    return next(req);
+  }
+
+  const authReq = req.clone({
+    setHeaders: { Authorization: `Bearer ${token}` },
+  });
+
+  return next(authReq);
+};
