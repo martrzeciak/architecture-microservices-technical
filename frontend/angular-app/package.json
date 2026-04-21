@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "proto:gen": "grpc_tools_node_protoc --plugin=protoc-gen-grpc-web=.\\node_modules\\.bin\\protoc-gen-grpc-web.cmd --js_out=import_style=commonjs:.\\src\\generated --grpc-web_out=import_style=typescript,mode=grpcwebtext:.\\src\\generated -I ..\\..\\protos ..\\..\\protos\\product.proto ..\\..\\protos\\order.proto",
-    "proto:gen:connect": ".\\node_modules\\.bin\\grpc_tools_node_protoc.cmd --plugin=protoc-gen-es=.\\node_modules\\.bin\\protoc-gen-es.cmd --es_out=.\\src\\generated-connect --plugin=protoc-gen-connect-es=.\\node_modules\\.bin\\protoc-gen-connect-es.cmd --connect-es_out=.\\src\\generated-connect -I ..\\..\\protos ..\\..\\protos\\product.proto ..\\..\\protos\\order.proto"
+    "proto:gen:connect": "node scripts/proto-gen-connect.js"
   },
   "prettier": {
     "printWidth": 100,
