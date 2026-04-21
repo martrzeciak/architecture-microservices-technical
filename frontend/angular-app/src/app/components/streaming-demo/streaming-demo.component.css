@@ -1,0 +1,91 @@
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #3f51b5;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link:hover { text-decoration: underline; }
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 { font-size: 1.6rem; margin: 0 0 0.25rem; color: #1a1a2e; }
+.page-header p { margin: 0; color: #666; font-size: 0.9rem; }
+
+.controls { margin-bottom: 1.5rem; }
+
+.btn-start, .btn-stop {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-start { background: #43a047; color: white; }
+.btn-start:hover { background: #388e3c; }
+.btn-stop { background: #e53935; color: white; }
+.btn-stop:hover { background: #c62828; }
+
+.status {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.status.pulse {
+  background: #e3f2fd;
+  color: #1565c0;
+  animation: blink 1s step-end infinite;
+}
+
+.status.done { background: #e8f5e9; color: #2e7d32; }
+
+.error {
+  background: #ffebee;
+  color: #c62828;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.stream-log {
+  background: #0d1117;
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.stream-row {
+  display: flex;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #1e2733;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #58a6ff;
+}
+
+.stream-row:last-child { border-bottom: none; }
+
+.id { color: #7ee787; width: 2rem; flex-shrink: 0; }
+.name { color: #e6edf3; flex: 1; }
+.price { color: #ffa657; }
+
+@keyframes blink {
+  50% { opacity: 0.5; }
+}

@@ -1,0 +1,43 @@
+<div class="container">
+  <a routerLink="/products" class="back-link">← Wróć do listy</a>
+
+  @if (isLoading()) {
+    <div class="loading">⏳ Ładowanie...</div>
+  }
+
+  @if (error()) {
+    <div class="error">❌ {{ error() }}</div>
+  }
+
+  @if (product(); as p) {
+    <div class="product-card">
+      <div class="product-header">
+        <h1>{{ p.name }}</h1>
+        <span class="protocol-badge">via {{ protocolLabel() }}</span>
+      </div>
+
+      <div class="product-body">
+        <div class="field">
+          <label>ID</label>
+          <span>{{ p.id }}</span>
+        </div>
+        <div class="field">
+          <label>Opis</label>
+          <span>{{ p.description }}</span>
+        </div>
+        <div class="field">
+          <label>Cena</label>
+          <span class="price">{{ p.price | number:'1.2-2' }} zł</span>
+        </div>
+        <div class="field">
+          <label>Kategoria</label>
+          <span>{{ p.categoryId ?? '-' }}</span>
+        </div>
+        <div class="field">
+          <label>Magazyn</label>
+          <span>{{ p.stock }} szt.</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

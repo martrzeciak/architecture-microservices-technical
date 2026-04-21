@@ -1,0 +1,40 @@
+<div class="container">
+  <a routerLink="/products" class="back-link">← Wróć do listy</a>
+
+  <header class="page-header">
+    <h1>▶ Server Streaming Demo</h1>
+    <p>Demonstracja gRPC Server Streaming (via Envoy :8080)</p>
+  </header>
+
+  <div class="controls">
+    @if (!isStreaming()) {
+      <button class="btn-start" (click)="startStream()">▶ Uruchom stream</button>
+    } @else {
+      <button class="btn-stop" (click)="stopStream()">⏹ Zatrzymaj</button>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="error">❌ {{ error() }}</div>
+  }
+
+  @if (isStreaming()) {
+    <div class="status pulse">📡 Stream aktywny…</div>
+  }
+
+  @if (isDone()) {
+    <div class="status done">✅ Stream zakończony - odebrano {{ streamedProducts().length }} produktów</div>
+  }
+
+  @if (streamedProducts().length > 0) {
+    <div class="stream-log">
+      @for (p of streamedProducts(); track p.id) {
+        <div class="stream-row">
+          <span class="id">#{{ p.id }}</span>
+          <span class="name">{{ p.name }}</span>
+          <span class="price">{{ p.price }} zł</span>
+        </div>
+      }
+    </div>
+  }
+</div>

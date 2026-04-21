@@ -1,0 +1,85 @@
+<div class="container">
+  <header class="page-header">
+    <h1>Lista produktów</h1>
+  </header>
+
+  <!-- Przełącznik protokołu -->
+  <div class="protocol-switcher">
+    <span class="protocol-label">Protokół:</span>
+    @for (p of protocols; track p.value) {
+      <button
+        class="protocol-btn"
+        [class.active]="activeProtocol() === p.value"
+        (click)="setProtocol(p.value)"
+      >
+        {{ p.label }}
+      </button>
+    }
+    <span class="protocol-info">{{ protocolLabel() }}</span>
+  </div>
+
+  <!-- Stan ładowania -->
+  @if (isLoading()) {
+    <div class="loading">⏳ Ładowanie przez {{ protocolLabel() }}...</div>
+  }
+
+  <!-- Błąd -->
+  @if (error()) {
+    <div class="error">
+      ❌ Błąd: {{ error() }}
+      <button (click)="load()">Ponów</button>
+    </div>
+  }
+
+  <!-- Statystyki -->
+  @if (products().length > 0) {
+    <div class="stats">
+      <span>Produktów: <strong>{{ products().length }}</strong></span>
+      <span>Łączna wartość: <strong>{{ totalPrice() | number:'1.2-2' }} PLN</strong></span>
+    </div>
+  }
+
+  <!-- Tabela produktów -->
+  @if (!isLoading() && products().length > 0) {
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nazwa</th>
+          <th>Opis</th>
+          <th>Cena</th>
+          <th>Magazyn</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of products(); track product.id) {
+          <tr>
+            <td>{{ product.id }}</td>
+            <td><strong>{{ product.name }}</strong></td>
+            <td>{{ product.description }}</td>
+            <td>{{ product.price | number:'1.2-2' }} zł</td>
+            <td>
+              <span>
+                {{ product.stock }} szt.
+              </span>
+            </td>
+            <td>
+              <a [routerLink]="['/products', product.id]" class="details-btn">
+                Szczegóły
+              </a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (!isLoading() && !error() && products().length === 0) {
+    <div class="empty">Brak produktów.</div>
+  }
+
+  <div class="streaming-link">
+    <a routerLink="/streaming">▶ Demo Server Streaming</a>
+  </div>
+</div>

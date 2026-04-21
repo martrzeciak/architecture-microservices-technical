@@ -1,0 +1,158 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  margin: 0 0 1.5rem;
+  color: #1a1a2e;
+}
+
+.protocol-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9ff;
+  border-radius: 8px;
+  border: 1px solid #e0e4ff;
+}
+
+.protocol-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.protocol-btn {
+  padding: 0.4rem 1rem;
+  border: 2px solid #c7cfff;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.protocol-btn:hover {
+  border-color: #5c6bc0;
+  background: #eef0ff;
+}
+
+.protocol-btn.active {
+  background: #3f51b5;
+  color: white;
+  border-color: #3f51b5;
+}
+
+.protocol-info {
+  font-size: 0.75rem;
+  color: #888;
+  margin-left: 0.5rem;
+}
+
+.loading, .error, .empty {
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  background: #fff8e1;
+  color: #f57c00;
+}
+
+.error {
+  background: #ffebee;
+  color: #c62828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.error button {
+  padding: 0.3rem 0.8rem;
+  background: #c62828;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  padding: 0.75rem 1rem;
+  background: #e8f5e9;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #2e7d32;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.product-table th {
+  background: #3f51b5;
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.product-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+}
+
+.product-table tr:last-child td {
+  border-bottom: none;
+}
+
+.product-table tr:hover td {
+  background: #fafbff;
+}
+
+.details-btn {
+  padding: 0.3rem 0.8rem;
+  background: #3f51b5;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: background 0.2s;
+}
+
+.details-btn:hover {
+  background: #303f9f;
+}
+
+.streaming-link {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.streaming-link a {
+  color: #3f51b5;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.streaming-link a:hover {
+  text-decoration: underline;
+}
