@@ -1,4 +1,4 @@
-# .NET
+# .NET build artifacts
 bin/
 obj/
 *.user
@@ -24,8 +24,9 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Test results
-tests/load-tests/results/
+# k6 benchmark results (generated during test runs)
+tests/k6/results/
 
-# Docs (tymczasowo)
-README.md
+# runtime logs created by run.ps1
+.logs/
+*.log
