@@ -557,4 +557,7 @@
   color: #ddd;
 }
 
-@charset \"UTF-8\";`n`n.batch-buttons { display: flex; gap: 8px; }`n.batch-buttons button { flex: 1; }`n.run-all-btn.matrix { background: #673ab7; }`n.run-all-btn.matrix:hover:not(:disabled) { background: #5e35b1; }
+.batch-buttons { display: flex; gap: 8px; }
+.batch-buttons button { flex: 1; }
+.run-all-btn.matrix { background: #673ab7; }
+.run-all-btn.matrix:hover:not(:disabled) { background: #5e35b1; }
