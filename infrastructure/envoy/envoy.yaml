@@ -16,6 +16,10 @@ static_resources:
                     - name: backend
                       domains: ["*"]
                       routes:
+                        - match: { prefix: "/order." }
+                          route:
+                            cluster: order_service
+                            timeout: 0s
                         - match: { prefix: "/" }
                           route:
                             cluster: product_service
@@ -49,14 +53,22 @@ static_resources:
 
   clusters:
     - name: product_service
-      connect_timeout: 0.25s
+      connect_timeout: 1s
       type: LOGICAL_DNS
       typed_extension_protocol_options:
         envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
           "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
           explicit_http_config:
-            http2_protocol_options: {}
+            http2_protocol_options:
+              max_concurrent_streams: 1000
+              initial_stream_window_size: 1048576
+              initial_connection_window_size: 10485760
       lb_policy: ROUND_ROBIN
+      circuit_breakers:
+        thresholds:
+          - max_connections: 10000
+            max_pending_requests: 10000
+            max_requests: 10000
       load_assignment:
         cluster_name: product_service
         endpoints:
@@ -66,3 +78,31 @@ static_resources:
                     socket_address:
                       address: product-service
                       port_value: 5001
+
+    - name: order_service
+      connect_timeout: 1s
+      type: LOGICAL_DNS
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http2_protocol_options:
+              max_concurrent_streams: 1000
+              initial_stream_window_size: 1048576
+              initial_connection_window_size: 10485760
+      lb_policy: ROUND_ROBIN
+      circuit_breakers:
+        thresholds:
+          - max_connections: 10000
+            max_pending_requests: 10000
+            max_requests: 10000
+      load_assignment:
+        cluster_name: order_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: order-service
+                      port_value: 5004
+

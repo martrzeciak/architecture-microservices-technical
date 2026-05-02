@@ -1,0 +1,55 @@
+<div class="status-page">
+
+  <div class="status-header">
+    <div class="header-left">
+      <h1>Status serwisów</h1>
+      @if (lastChecked()) {
+        <span class="last-checked">Ostatnie sprawdzenie: {{ lastChecked() | date:'HH:mm:ss' }}</span>
+      }
+    </div>
+    <button class="refresh-btn" [disabled]="loading()" (click)="check()">
+      <span [class.spin]="loading()">↻</span> Odśwież
+    </button>
+  </div>
+
+  @if (!runnerOk()) {
+    <div class="alert alert-error">
+      Runner server niedostępny. Uruchom: <code>cd tests/runner &amp;&amp; node server.js</code>
+    </div>
+  }
+
+  @if (runnerOk() && services().length) {
+    <div class="summary" [class.all-ok]="allOk()" [class.has-errors]="!allOk()">
+      @if (allOk()) {
+        <span class="summary-icon">✅</span>
+        <span>Wszystkie serwisy działają</span>
+      } @else {
+        <span class="summary-icon">⚠️</span>
+        <span>{{ okCount() }} / {{ services().length }} serwisów działa</span>
+      }
+    </div>
+
+    <div class="cards">
+      @for (svc of services(); track svc.id) {
+        <div class="card" [class.ok]="svc.ok" [class.error]="!svc.ok">
+          <div class="card-top">
+            <span class="indicator" [class.ok]="svc.ok" [class.error]="!svc.ok"></span>
+            <span class="service-label">{{ svc.label }}</span>
+            <span class="badge" [class.badge-ok]="svc.ok" [class.badge-err]="!svc.ok">
+              {{ svc.ok ? 'OK' : 'OFFLINE' }}
+            </span>
+          </div>
+          <div class="card-detail">
+            <span class="url">{{ svc.url }}</span>
+            @if (svc.ok) {
+              <span class="latency">{{ svc.latency }} ms</span>
+            } @else if (svc.error) {
+              <span class="error-msg">{{ svc.error }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

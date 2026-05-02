@@ -1,84 +1,71 @@
 using EShop.ProductService;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
+using ProductService.Data;
 
 namespace ProductService.Services;
 
-public class ProductGrpcService : EShop.ProductService.ProductService.ProductServiceBase
+public class ProductGrpcService(ProductDbContext db) : EShop.ProductService.ProductService.ProductServiceBase
 {
-    private static readonly List<Product> _products =
-    [
-        new Product { Id = "1", Name = "Laptop Pro 15", Description = "High-performance laptop", Price = 2499.99, CategoryId = "electronics", Stock = 10 },
-        new Product { Id = "2", Name = "Wireless Mouse", Description = "Ergonomic wireless mouse", Price = 49.99, CategoryId = "electronics", Stock = 100 },
-        new Product { Id = "3", Name = "Mechanical Keyboard", Description = "TKL mechanical keyboard", Price = 129.99, CategoryId = "electronics", Stock = 50 },
-        new Product { Id = "4", Name = "USB-C Hub", Description = "7-in-1 USB-C hub", Price = 39.99, CategoryId = "electronics", Stock = 200 },
-        new Product { Id = "5", Name = "Monitor 27\"", Description = "4K IPS display 27 inch", Price = 599.99, CategoryId = "electronics", Stock = 25 },
-    ];
-    private static readonly Lock _lock = new();
-
-    public static IEnumerable<Product> GetProducts()
+    public override async Task<ListProductsResponse> ListProducts(ListProductsRequest request, ServerCallContext context)
     {
-        lock (_lock) { return _products.ToList(); }
-    }
-
-    public static Product AddProduct(string name, string description, double price, string categoryId, int stock)
-    {
-        var product = new Product
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = name,
-            Description = description,
-            Price = price,
-            CategoryId = categoryId,
-            Stock = stock,
-        };
-        lock (_lock) { _products.Add(product); }
-        return product;
-    }
-
-    public override Task<ListProductsResponse> ListProducts(ListProductsRequest request, ServerCallContext context)
-    {
-        var products = _products.AsEnumerable();
+        var query = db.Products.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrEmpty(request.CategoryId))
-            products = products.Where(p => p.CategoryId == request.CategoryId);
+            query = query.Where(p => p.CategoryId == request.CategoryId);
 
+        var totalCount = await query.CountAsync(context.CancellationToken);
         var pageSize = request.PageSize > 0 ? request.PageSize : 10;
         var page = request.Page > 0 ? request.Page : 1;
 
-        var paged = products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var entities = await query
+            .OrderBy(e => e.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(context.CancellationToken);
 
-        var response = new ListProductsResponse { TotalCount = products.Count() };
-        response.Products.AddRange(paged);
-
-        return Task.FromResult(response);
+        var response = new ListProductsResponse { TotalCount = totalCount };
+        response.Products.AddRange(entities.Select(e => e.ToProto()));
+        return response;
     }
 
-    public override Task<Product> GetProduct(GetProductRequest request, ServerCallContext context)
+    public override async Task<Product> GetProduct(GetProductRequest request, ServerCallContext context)
     {
-        var product = _products.FirstOrDefault(p => p.Id == request.Id)
+        var entity = await db.Products.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == request.Id, context.CancellationToken)
             ?? throw new RpcException(new Status(StatusCode.NotFound, $"Product '{request.Id}' not found."));
 
-        return Task.FromResult(product);
+        return entity.ToProto();
     }
 
-    public override Task<Product> CreateProduct(CreateProductRequest request, ServerCallContext context)
+    public override async Task<Product> CreateProduct(CreateProductRequest request, ServerCallContext context)
     {
-        var product = AddProduct(request.Name, request.Description, request.Price, request.CategoryId, request.Stock);
-        return Task.FromResult(product);
+        var entity = new ProductEntity
+        {
+            Name = request.Name,
+            Description = request.Description,
+            Price = request.Price,
+            CategoryId = request.CategoryId,
+            Stock = request.Stock,
+        };
+        db.Products.Add(entity);
+        await db.SaveChangesAsync(context.CancellationToken);
+        return entity.ToProto();
     }
 
     public override async Task StreamProducts(StreamProductsRequest request, IServerStreamWriter<Product> responseStream, ServerCallContext context)
     {
-        var products = _products.AsEnumerable();
+        var query = db.Products.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrEmpty(request.CategoryId))
-            products = products.Where(p => p.CategoryId == request.CategoryId);
+            query = query.Where(p => p.CategoryId == request.CategoryId);
 
-        foreach (var product in products)
+        await foreach (var entity in query.AsAsyncEnumerable().WithCancellation(context.CancellationToken))
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            await responseStream.WriteAsync(product);
+            await responseStream.WriteAsync(entity.ToProto());
+            // simulate some processing delay per item
             await Task.Delay(100, context.CancellationToken);
         }
     }
 }
+

@@ -1,0 +1,286 @@
+<div class="runner-page">
+
+  <!-- Błąd połączenia -->
+  @if (serverError()) {
+    <div class="server-error">
+      <span class="error-icon">⚠️</span>
+      <div>
+        <strong>Runner server niedostępny</strong>
+        <p>Uruchom go poleceniem: <code>cd tests/runner &amp;&amp; npm install &amp;&amp; node server.js</code></p>
+      </div>
+    </div>
+  }
+
+  <!-- Health status bar -->
+  @if (health().length > 0) {
+    <div class="health-bar">
+      @for (svc of health(); track svc.id) {
+        <div class="health-chip" [class.up]="svc.ok" [class.down]="!svc.ok" [title]="svc.label + ': ' + (svc.ok ? svc.latency + 'ms' : 'DOWN')">
+          <span class="health-dot"></span>
+          <span class="health-name">{{ svc.id }}</span>
+        </div>
+      }
+      <button class="health-refresh" (click)="loadHealth()" [disabled]="healthLoading()" title="Odśwież status">
+        <span [class.spin]="healthLoading()">↻</span>
+      </button>
+    </div>
+  }
+
+  <div class="runner-layout">
+
+    <!-- Lewy panel: konfiguracja -->
+    <aside class="config-panel">
+      <h2 class="panel-title">Konfiguracja testu</h2>
+
+      <!-- Wybór scenariusza -->
+      <section class="config-section">
+        <h3>Scenariusz</h3>
+        <div class="scenario-list">
+          @for (s of scenarios(); track s.id) {
+            <button
+              class="scenario-card"
+              [class.selected]="selectedScenarioId() === s.id"
+              [class.queued]="runAllQueue().includes(s.id) && s.id !== selectedScenarioId()"
+              (click)="selectScenario(s.id)"
+            >
+              <div class="scenario-card-top">
+                <span class="scenario-name">{{ s.name }}</span>
+                <span class="badge" [ngClass]="protocolColors[s.protocol]">{{ s.protocol }}</span>
+              </div>
+              <p class="scenario-desc">{{ s.description }}</p>
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- Wybór VU -->
+      <section class="config-section">
+        <h3>Wirtualni użytkownicy (VU)</h3>
+        <div class="vu-selector">
+          @for (vu of vuOptions; track vu) {
+            <button
+              class="vu-btn"
+              [class.active]="selectedVu() === vu"
+              (click)="selectedVu.set(vu)"
+            >{{ vu }}</button>
+          }
+        </div>
+      </section>
+
+      <!-- Wybór PAGE_SIZE -->
+      <section class="config-section">
+        <h3>Rozmiar strony (PAGE_SIZE)</h3>
+        <div class="vu-selector">
+          @for (ps of pageSizeOptions; track ps) {
+            <button
+              class="vu-btn"
+              [class.active]="selectedPageSize() === ps"
+              (click)="selectedPageSize.set(ps)"
+            >{{ ps }}</button>
+          }
+        </div>
+      </section>
+
+      <!-- TLS toggle (tylko dla REST) -->
+      @if (isRestScenario()) {
+        <section class="config-section">
+          <h3>REST z TLS (HTTPS)</h3>
+          <p class="tls-hint">Włącz aby porównywać REST vs gRPC-Web z tym samym narzutem TLS</p>
+          <label class="tls-toggle">
+            <input
+              type="checkbox"
+              [checked]="restTls()"
+              (change)="restTls.set(!restTls())"
+            />
+            <span class="tls-label">{{ restTls() ? 'HTTPS (:5002/:5005)' : 'HTTP (:5000/:5003)' }}</span>
+          </label>
+        </section>
+      }
+
+      <!-- Bypass Cache toggle (tylko dla produktów) -->
+      @if (selectedScenario()?.service === 'ProductService') {
+        <section class="config-section">
+          <h3>Bypass Cache (Redis)</h3>
+          <p class="tls-hint">Wymuś odczyt z bazy danych PostgreSQL (Cold Start)</p>
+          <label class="tls-toggle">
+            <input
+              type="checkbox"
+              [checked]="bypassCache()"
+              (change)="bypassCache.set(!bypassCache())"
+            />
+            <span class="tls-label">{{ bypassCache() ? 'Baza Danych (Bypass)' : 'Cache (Redis)' }}</span>
+          </label>
+        </section>
+      }
+
+      <!-- Przyciski akcji -->
+      <div class="action-buttons">
+        <button
+          class="run-btn"
+          [disabled]="running() || serverError()"
+          (click)="runTest()"
+        >
+          @if (running() && !runAllActive()) {
+            <span class="spinner"></span> Trwa test...
+          } @else {
+            ▶ Uruchom test
+          }
+        </button>
+
+        <div class="batch-buttons">
+          <button
+            class="run-all-btn"
+            [disabled]="running() || serverError()"
+            (click)="runAll()"
+            title="Uruchom wszystkie scenariusze sekwencyjnie"
+          >
+            @if (runAllActive() && !matrixMode()) {
+              <span class="spinner"></span> Wszystkie ({{ runAllQueue().length }})
+            } @else {
+              ⏩ Wszystkie
+            }
+          </button>
+
+          <button
+            class="run-all-btn matrix"
+            [disabled]="running() || serverError()"
+            (click)="runMatrix()"
+            title="Uruchom Macierz: Wszystkie scenariusze x VU [10, 50, 100]"
+          >
+            @if (runAllActive() && matrixMode()) {
+              <span class="spinner"></span> Macierz ({{ runAllQueue().length }})
+            } @else {
+              📊 Macierz
+            }
+          </button>
+        </div>
+
+        @if (running()) {
+          <button class="stop-btn" (click)="stopTest()">⏹ Stop</button>
+        }
+      </div>
+
+      <!-- Wynik ostatniego testu -->
+      @if (lastExitCode() !== null) {
+        <div class="last-result" [class.success]="lastExitCode() === 0" [class.fail]="lastExitCode() !== 0">
+          @if (lastExitCode() === 0) { ✅ Test zakończony pomyślnie }
+          @else { ❌ Test zakończony błędem (kod {{ lastExitCode() }}) }
+        </div>
+      }
+
+      <!-- Quick summary po teście -->
+      @if (quickSummary(); as qs) {
+        <div class="quick-summary">
+          <h4>Wynik ostatniego testu</h4>
+          <div class="qs-grid">
+            <div class="qs-item">
+              <span class="qs-label">Throughput</span>
+              <span class="qs-value">{{ fmt(qs.reqsPerSec, 1) }} req/s</span>
+            </div>
+            <div class="qs-item">
+              <span class="qs-label">Avg</span>
+              <span class="qs-value">{{ fmtMs(qs.avg) }}</span>
+            </div>
+            <div class="qs-item highlight">
+              <span class="qs-label">p(95)</span>
+              <span class="qs-value">{{ fmtMs(qs.p95) }}</span>
+            </div>
+            <div class="qs-item" [class.error]="(qs.errorRate ?? 0) > 0">
+              <span class="qs-label">Błędy</span>
+              <span class="qs-value">{{ qs.errorRate !== null ? (qs.errorRate * 100).toFixed(2) + '%' : 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </aside>
+
+    <!-- Prawy panel: progress + logi + historia -->
+    <main class="output-panel">
+
+      <!-- Progress bar (tylko podczas testu) -->
+      @if (running()) {
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">{{ progressLabel() }}</span>
+            <span class="progress-time">{{ elapsedSec() }}s / {{ totalSec }}s</span>
+          </div>
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [style.width.%]="progressPct()"
+              [style.background]="progressColor()"
+            ></div>
+          </div>
+          <div class="progress-phases">
+            <span [class.active]="elapsedSec() < 30">Rozgrzewka (30s)</span>
+            <span [class.active]="elapsedSec() >= 30 && elapsedSec() < 150">Pomiar (120s)</span>
+            <span [class.active]="elapsedSec() >= 150">Schładzanie (10s)</span>
+          </div>
+        </div>
+      }
+
+      <!-- Logi live -->
+      <section class="log-section">
+        <div class="log-header">
+          <h2>Log testu</h2>
+          @if (running()) {
+            <span class="live-badge">LIVE</span>
+          }
+        </div>
+        <div class="log-box">
+          @if (logs().length === 0 && !running()) {
+            <span class="log-empty">Wybierz scenariusz i kliknij "Uruchom test"</span>
+          }
+          @for (line of logs(); track $index) {
+            <div class="log-line">{{ line }}</div>
+          }
+        </div>
+      </section>
+
+      <!-- Historia wyników -->
+      <section class="results-section">
+        <div class="results-header">
+          <h2>Historia wyników</h2>
+          <button class="refresh-btn" (click)="loadResults()">↻ Odśwież</button>
+        </div>
+        @if (results().length === 0) {
+          <p class="no-results">Brak zapisanych wyników.</p>
+        } @else {
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Scenariusz</th>
+                <th>VU</th>
+                <th>PS</th>
+                <th>TLS</th>
+                <th>Rozmiar</th>
+                <th>Data</th>
+                <th>Plik</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of results(); track r.file) {
+                <tr>
+                  <td>{{ r.scenario }}</td>
+                  <td>{{ r.vu }}</td>
+                  <td>{{ r.pageSize ?? '-' }}</td>
+                  <td>{{ r.tls ? '🔒' : '-' }}</td>
+                  <td>{{ formatSize(r.size) }}</td>
+                  <td>{{ r.created | date:'dd.MM.yy HH:mm' }}</td>
+                  <td>
+                    <a
+                      [href]="'http://localhost:3100/results/' + r.file"
+                      target="_blank"
+                      class="download-link"
+                    >JSON</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+    </main>
+  </div>
+</div>

@@ -1,0 +1,232 @@
+<div class="results-page">
+
+  <div class="page-header">
+    <h1>Wyniki testów</h1>
+    <button class="refresh-btn" (click)="load()" [disabled]="loading()">
+      <span [class.spin]="loading()">↻</span> Odśwież
+    </button>
+  </div>
+
+  @if (serverError()) {
+    <div class="alert">
+      Runner server niedostępny. Uruchom: <code>cd tests/runner &amp;&amp; node server.js</code>
+    </div>
+  }
+
+  @if (!serverError() && !loading() && summaries().length === 0) {
+    <div class="empty">
+      Brak wyników. Uruchom testy w zakładce <strong>Testy wydajności</strong>.
+    </div>
+  }
+
+  @if (summaries().length > 0) {
+    <div class="dashboard-layout">
+
+      <!-- LEWA: panel wyboru przebiegów -->
+      <aside class="runs-panel">
+
+        <!-- Filtry -->
+        <div class="filters">
+          <label>
+            Serwis
+            <select [value]="filterService()" (change)="filterService.set($any($event.target).value)">
+              @for (s of allServices(); track s) {
+                <option [value]="s">{{ s === 'all' ? 'Wszystkie' : s }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            VU
+            <select (change)="setFilterVu($any($event.target).value)">
+              @for (v of allVus(); track v) {
+                <option [value]="v">{{ v === 'all' ? 'Wszystkie' : v }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            PS
+            <select (change)="setFilterPs($any($event.target).value)">
+              @for (p of allPs(); track p) {
+                <option [value]="p">{{ p === 'all' ? 'Wszystkie' : p }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            TLS
+            <select [value]="filterTls()" (change)="filterTls.set($any($event.target).value)">
+              <option value="all">Wszystkie</option>
+              <option value="yes">Tak</option>
+              <option value="no">Nie</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Akcje zaznaczania -->
+        <div class="selection-bar">
+          <span class="sel-count">
+            {{ selectedFiles().size }} / {{ filtered().length }} zaznaczonych
+          </span>
+          <button class="sel-btn" (click)="selectAll()">Zaznacz wszystkie</button>
+          <button class="sel-btn" (click)="clearSelection()" [disabled]="selectedFiles().size === 0">Wyczyść</button>
+        </div>
+
+        <!-- Lista -->
+        <div class="runs-list">
+          @for (s of filtered(); track s.file) {
+            <div
+              class="run-row"
+              [class.selected]="isSelected(s.file)"
+              (click)="toggleSelect(s.file)"
+            >
+              <input
+                type="checkbox"
+                [checked]="isSelected(s.file)"
+                (click)="$event.stopPropagation()"
+                (change)="toggleSelect(s.file)"
+              />
+              <span class="proto-dot" [style.background]="protocolColor(s.protocol)" title="{{ s.protocol }}"></span>
+              <div class="run-info">
+                <span class="run-name">{{ s.scenarioName }}</span>
+                <span class="run-meta">
+                  VU {{ s.vu }}
+                  @if (s.pageSize) { · PS {{ s.pageSize }} }
+                  @if (s.tls) { · 🔒TLS }
+                  · {{ s.created | date:'dd.MM HH:mm' }}
+                </span>
+              </div>
+              <div class="run-metrics">
+                <span class="metric-chip">{{ fmt(s.metrics?.reqsPerSec ?? null, 0) }} r/s</span>
+                <span class="metric-chip p95">p95: {{ fmtMs(s.metrics?.p95 ?? null) }}</span>
+              </div>
+              <button
+                class="delete-btn"
+                title="Usuń"
+                (click)="$event.stopPropagation(); deleteRun(s)"
+              >🗑️</button>
+            </div>
+          }
+        </div>
+      </aside>
+
+      <!-- PRAWA: wykresy + karty porównawcze -->
+      <main class="compare-panel">
+
+        <!-- Wykresy — zawsze na górze prawej kolumny -->
+        <div class="charts-section">
+          <div class="chart-box">
+            <h3>Przepustowość (req/s)</h3>
+            <div class="chart-wrap">
+              @if (comparison().length === 0) {
+                <div class="chart-placeholder">Zaznacz przebiegi aby zobaczyć wykres</div>
+              }
+              <canvas #throughputCanvas [style.display]="comparison().length > 0 ? 'block' : 'none'"></canvas>
+            </div>
+          </div>
+          <div class="chart-box">
+            <h3>Percentyle latencji (ms)</h3>
+            <div class="chart-wrap">
+              @if (comparison().length === 0) {
+                <div class="chart-placeholder">Zaznacz przebiegi aby zobaczyć wykres</div>
+              }
+              <canvas #latencyCanvas [style.display]="comparison().length > 0 ? 'block' : 'none'"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Karty porównawcze -->
+        @if (comparison().length === 0) {
+          <div class="compare-empty">
+            <span>☑️</span>
+            <p>Zaznacz przebiegi po lewej<br>aby je porównać</p>
+          </div>
+        } @else {
+          <div class="compare-header">
+            <h2>Porównanie ({{ comparison().length }})</h2>
+            @if (winnerFile()) {
+              <span class="winner-label">🏆 najniższe p95</span>
+            }
+          </div>
+          <div class="compare-cards">
+            @for (s of comparison(); track s.file) {
+              <div
+                class="compare-card"
+                [class.winner]="s.file === winnerFile()"
+                [style.border-color]="protocolColor(s.protocol)"
+              >
+                <div class="card-header" [style.background]="protocolColor(s.protocol)">
+                  <span>{{ s.protocol }}</span>
+                  @if (s.file === winnerFile()) { <span class="trophy">🏆</span> }
+                </div>
+                <div class="card-sub">
+                  {{ s.scenarioName }} · VU {{ s.vu }}
+                  @if (s.pageSize) { · PS {{ s.pageSize }} }
+                  @if (s.tls) { · 🔒 }
+                </div>
+                <div class="card-body">
+                  <div class="m-row highlight">
+                    <span>Throughput</span>
+                    <strong>{{ fmt(s.metrics?.reqsPerSec ?? null, 1) }} req/s</strong>
+                  </div>
+                  <div class="m-row">
+                    <span>Avg</span>
+                    <span>{{ fmtMs(s.metrics?.avg ?? null) }}</span>
+                  </div>
+                  <div class="m-row">
+                    <span>Mediana</span>
+                    <span>{{ fmtMs(s.metrics?.med ?? null) }}</span>
+                  </div>
+                  <div class="m-row">
+                    <span>p(90)</span>
+                    <span>{{ fmtMs(s.metrics?.p90 ?? null) }}</span>
+                  </div>
+                  <div class="m-row highlight">
+                    <span>p(95)</span>
+                    <strong>{{ fmtMs(s.metrics?.p95 ?? null) }}</strong>
+                  </div>
+                  <div class="m-row">
+                    <span>p(99)</span>
+                    <span>{{ fmtMs(s.metrics?.p99 ?? null) }}</span>
+                  </div>
+                  <div class="m-row">
+                    <span>Max</span>
+                    <span>{{ fmtMs(s.metrics?.max ?? null) }}</span>
+                  </div>
+                  <div class="m-row" [class.error]="(s.metrics?.errorRate ?? 0) > 0">
+                    <span>Błędy</span>
+                    <span>{{ fmtRate(s.metrics?.errorRate ?? null) }}</span>
+                  </div>
+                  <div class="bar-label">p(95) latency</div>
+                  <div class="bar-track">
+                    <div class="bar-fill"
+                      [style.width]="barWidth(s.metrics?.p95 ?? null)"
+                      [style.background]="protocolColor(s.protocol)">
+                    </div>
+                  </div>
+
+                  <!-- Bandwidth -->
+                  @if (s.metrics?.dataReceived !== null && s.metrics?.dataReceived !== undefined) {
+                    <div class="bw-section">
+                      <div class="m-row">
+                        <span>Dane odebrane</span>
+                        <span>{{ fmtBytes(s.metrics?.dataReceived ?? null) }}</span>
+                      </div>
+                      <div class="m-row">
+                        <span>Bandwidth</span>
+                        <span class="bw-chip">{{ fmtBytesPerSec(s.metrics?.dataReceivedRate ?? null) }}</span>
+                      </div>
+                    </div>
+                  }
+                  @if (s.metrics?.thresholdsFailed) {
+                    <div class="threshold-fail">Przekroczono progi!</div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </main>
+
+    </div>
+  }
+</div>
+
