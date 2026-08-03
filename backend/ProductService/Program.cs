@@ -149,4 +149,19 @@ app.MapPost("/api/products", async (ProductDbContext db, CreateProductDto dto) =
     return Results.Created($"/api/products/{entity.Id}", entity.ToProto());
 });
 
+// Echo endpoint: returns hardcoded data without DB/cache — isolates protocol overhead
+app.MapGet("/api/echo", (int count = 200) =>
+{
+    var products = Enumerable.Range(1, count).Select(i => new
+    {
+        id = i.ToString(),
+        name = $"Echo Product {i}",
+        description = $"This is a hardcoded echo product number {i} for benchmarking protocol overhead",
+        price = 9.99 * i,
+        categoryId = "echo",
+        stock = 100,
+    });
+    return Results.Ok(new { products, totalCount = count });
+});
+
 app.Run();

@@ -23,10 +23,12 @@ VU_LEVELS=(10 50 100 500)
 PAGE_SIZES=(10 50 100 200)
 ORDER_ITEMS=(1 5 10)
 CACHE_STATES=(0 1)
-RUNS=1
+RUNS=3
 
 # Parse arguments
 QUICK=false
+REMOTE=false
+BACKEND_IP=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --quick)
@@ -37,6 +39,14 @@ while [[ $# -gt 0 ]]; do
       CACHE_STATES=(0 1)
       RUNS=1
       shift
+      ;;
+    --remote)
+      REMOTE=true
+      shift
+      ;;
+    --backend-ip)
+      BACKEND_IP="$2"
+      shift 2
       ;;
     --vu)
       IFS=',' read -ra VU_LEVELS <<< "$2"
@@ -69,6 +79,23 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Validate remote mode
+if [[ "$REMOTE" == "true" && -z "$BACKEND_IP" ]]; then
+  echo "ERROR: --remote requires --backend-ip <IP>"
+  echo "Usage: ./run-all-linux.sh --remote --backend-ip 168.119.x.x"
+  exit 1
+fi
+
+# Set K6 environment mode
+if [[ "$REMOTE" == "true" ]]; then
+  K6_ENV_MODE="remote"
+  DOCKER_NETWORK=""  # no Docker network needed — k6 connects via public IP
+  log "Mode: REMOTE (backend at $BACKEND_IP)"
+else
+  K6_ENV_MODE="docker"
+  log "Mode: DOCKER (local network)"
+fi
+
 # Scenario definitions
 PRODUCT_SCENARIOS=(
   "scenario-products-rest"
@@ -88,11 +115,20 @@ ORDER_SCENARIOS=(
   "scenario-orders-grpc-native"
 )
 
+# Echo scenarios — no DB, pure protocol overhead
+ECHO_SCENARIOS=(
+  "scenario-echo-rest"
+  "scenario-echo-grpc-envoy"
+  "scenario-echo-grpc-direct"
+  "scenario-echo-grpc-native"
+)
+
 # Calculate total tests
 PRODUCT_TESTS=$(( ${#PRODUCT_SCENARIOS[@]} * ${#VU_LEVELS[@]} * ${#PAGE_SIZES[@]} * ${#CACHE_STATES[@]} * RUNS ))
 STREAM_TESTS=$(( ${#STREAM_SCENARIOS[@]} * ${#VU_LEVELS[@]} * RUNS ))
 ORDER_TESTS=$(( ${#ORDER_SCENARIOS[@]} * ${#VU_LEVELS[@]} * ${#ORDER_ITEMS[@]} * RUNS ))
-TOTAL_TESTS=$(( PRODUCT_TESTS + STREAM_TESTS + ORDER_TESTS ))
+ECHO_TESTS=$(( ${#ECHO_SCENARIOS[@]} * ${#VU_LEVELS[@]} * ${#PAGE_SIZES[@]} * RUNS ))
+TOTAL_TESTS=$(( PRODUCT_TESTS + STREAM_TESTS + ORDER_TESTS + ECHO_TESTS ))
 COMPLETED=0
 
 mkdir -p "$RESULTS_DIR"
@@ -133,6 +169,12 @@ run_k6() {
   shift 3
   local env_args=("$@")
 
+  # Add K6_ENV and BACKEND_IP to env args
+  env_args+=(-e "K6_ENV=$K6_ENV_MODE")
+  if [[ "$REMOTE" == "true" ]]; then
+    env_args+=(-e "BACKEND_IP=$BACKEND_IP")
+  fi
+
   COMPLETED=$((COMPLETED + 1))
   log_color "36" "[$COMPLETED/$TOTAL_TESTS] $label"
 
@@ -140,7 +182,8 @@ run_k6() {
   docker run --rm \
     -v "$SCRIPT_DIR:/scripts:ro" \
     -v "$RESULTS_DIR:/results" \
-    --network "$DOCKER_NETWORK" \
+    ${REMOTE:+--add-host=host.docker.internal:host-gateway} \
+    ${DOCKER_NETWORK:+--network "$DOCKER_NETWORK"} \
     "${env_args[@]}" \
     grafana/k6 \
     run \
@@ -176,7 +219,6 @@ for bypass in "${CACHE_STATES[@]}"; do
           run_k6 "$scenario" "$label" "$json_file" \
             -e "VU=$vu" \
             -e "PAGE_SIZE=$page_size" \
-            -e "K6_ENV=docker" \
             -e "BYPASS_CACHE=$bypass"
         done
       done
@@ -194,8 +236,7 @@ for vu in "${VU_LEVELS[@]}"; do
       json_file="${scenario}_VU${vu}_CAT${STREAM_CATEGORY}_run${run}_${TIMESTAMP}-summary.json"
       run_k6 "$scenario" "$label" "$json_file" \
         -e "VU=$vu" \
-        -e "STREAM_CATEGORY=$STREAM_CATEGORY" \
-        -e "K6_ENV=docker"
+        -e "STREAM_CATEGORY=$STREAM_CATEGORY"
     done
   done
 done
@@ -211,8 +252,23 @@ for order_items in "${ORDER_ITEMS[@]}"; do
         json_file="${scenario}_VU${vu}_OI${order_items}_run${run}_${TIMESTAMP}-summary.json"
         run_k6 "$scenario" "$label" "$json_file" \
           -e "VU=$vu" \
-          -e "ORDER_ITEMS=$order_items" \
-          -e "K6_ENV=docker"
+          -e "ORDER_ITEMS=$order_items"
+      done
+    done
+  done
+done
+
+echo ""
+log_color "33" ">>> Echo — pure protocol overhead ($ECHO_TESTS tests)"
+for page_size in "${PAGE_SIZES[@]}"; do
+  for vu in "${VU_LEVELS[@]}"; do
+    for run in $(seq 1 $RUNS); do
+      for scenario in "${ECHO_SCENARIOS[@]}"; do
+        label="$scenario | VU=$vu | COUNT=$page_size | Run=$run"
+        json_file="${scenario}_VU${vu}_COUNT${page_size}_run${run}_${TIMESTAMP}-summary.json"
+        run_k6 "$scenario" "$label" "$json_file" \
+          -e "VU=$vu" \
+          -e "PAGE_SIZE=$page_size"
       done
     done
   done

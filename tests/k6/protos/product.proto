@@ -9,6 +9,8 @@ service ProductService {
   rpc GetProduct (GetProductRequest) returns (Product);
   rpc CreateProduct (CreateProductRequest) returns (Product);
   rpc StreamProducts (StreamProductsRequest) returns (stream Product);
+  // Echo endpoint: returns hardcoded products without DB/cache — isolates protocol overhead
+  rpc EchoProducts (EchoProductsRequest) returns (ListProductsResponse);
 }
 
 message Product {
@@ -45,4 +47,8 @@ message CreateProductRequest {
 
 message StreamProductsRequest {
   string category_id = 1;
+}
+
+message EchoProductsRequest {
+  int32 count = 1; // number of hardcoded products to return (default 200)
 }

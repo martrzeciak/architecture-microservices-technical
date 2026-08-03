@@ -1,10 +1,15 @@
 # Production override for Hetzner Cloud CX42 (8 vCPU, 16 GB RAM).
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 #
+# Architecture: 2-server setup
+#   Server 1 (this): backend services, DBs, Envoy, observability
+#   Server 2: k6 load generator (separate machine, connects via BACKEND_IP)
+#
 # Changes vs base:
 #   - Raised resource limits (no reservations)
-#   - Added angular and runner containers
 #   - PostgreSQL tuned for 16 GB host
+#   - Angular frontend (optional, for manual testing via browser)
+#   - No runner/k6 — tests run from Server 2
 
 services:
   postgres:
@@ -83,7 +88,8 @@ services:
           cpus: '1.0'
           memory: 512M
 
-  # --- NEW: Angular frontend (nginx + static build) ---
+  # --- Angular frontend (optional, for manual testing/demo) ---
+  # Start with: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build angular
   angular:
     build:
       context: ./frontend/angular-app
@@ -95,6 +101,8 @@ services:
         - RUNNER_URL=http://HOST_IP:3100
     ports:
       - "4200:80"
+    profiles:
+      - ui
     deploy:
       resources:
         limits:
@@ -102,30 +110,4 @@ services:
           memory: 256M
     depends_on:
       product-service:
-        condition: service_healthy
-
-  # --- NEW: k6 Runner Server (Express.js) ---
-  runner:
-    build:
-      context: ./tests/runner
-      dockerfile: Dockerfile
-    ports:
-      - "3100:3100"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./tests/k6:/app/k6-scripts
-      - ./tests/k6/results:/app/k6-results
-    environment:
-      - K6_SCRIPTS_DIR=/app/k6-scripts
-      - K6_RESULTS_DIR=/app/k6-results
-      - DOCKER_NETWORK=architecture-microservices-technical_default
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
-    depends_on:
-      product-service:
-        condition: service_healthy
-      order-service:
         condition: service_healthy

@@ -1,10 +1,25 @@
 // Shared config for all k6 scenarios.
 // Set K6_ENV=docker to use Docker service names instead of localhost.
+// Set K6_ENV=remote + BACKEND_IP to test against a remote server (2-server setup).
 import http from 'k6/http';
 
 const isDocker = __ENV.K6_ENV === 'docker';
+const isRemote = __ENV.K6_ENV === 'remote';
+const BACKEND_IP = __ENV.BACKEND_IP || '127.0.0.1';
 
-export const BASE_URLS = isDocker
+export const BASE_URLS = isRemote
+  ? {
+      productRest:      `http://${BACKEND_IP}:5000`,
+      productRestTls:   `https://${BACKEND_IP}:5002`,
+      orderRest:        `http://${BACKEND_IP}:5003`,
+      orderRestTls:     `https://${BACKEND_IP}:5005`,
+      envoy:            `http://${BACKEND_IP}:8080`,
+      productDirect:    `https://${BACKEND_IP}:5002`,
+      orderDirect:      `https://${BACKEND_IP}:5005`,
+      productGrpc:      `${BACKEND_IP}:5001`,
+      orderGrpc:        `${BACKEND_IP}:5004`,
+    }
+  : isDocker
   ? {
       productRest:      'http://product-service:5000',
       productRestTls:   'https://product-service:5002',
@@ -59,7 +74,9 @@ export const BYPASS_CACHE = __ENV.BYPASS_CACHE === '1';
 // call before cold-cache test runs to ensure Redis is empty
 export function flushCacheIfCold() {
   if (!BYPASS_CACHE) return;
-  const base = isDocker ? 'http://product-service:5000' : 'http://localhost:5000';
+  const base = isRemote
+    ? `http://${BACKEND_IP}:5000`
+    : isDocker ? 'http://product-service:5000' : 'http://localhost:5000';
   const res = http.post(`${base}/admin/cache/flush`, null);
   if (res.status !== 200) {
     console.warn(`Cache flush failed: ${res.status}`);

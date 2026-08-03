@@ -88,5 +88,30 @@ public class ProductGrpcService(ProductDbContext db, IDistributedCache cache) : 
             await responseStream.WriteAsync(entity.ToProto());
         }
     }
+
+    /// <summary>
+    /// Echo endpoint: returns hardcoded product data without DB or cache.
+    /// Used to isolate pure protocol serialization overhead in benchmarks.
+    /// </summary>
+    public override Task<ListProductsResponse> EchoProducts(EchoProductsRequest request, ServerCallContext context)
+    {
+        var count = request.Count > 0 ? request.Count : 200;
+        var response = new ListProductsResponse { TotalCount = count };
+
+        for (int i = 1; i <= count; i++)
+        {
+            response.Products.Add(new Product
+            {
+                Id = i.ToString(),
+                Name = $"Echo Product {i}",
+                Description = $"This is a hardcoded echo product number {i} for benchmarking protocol overhead",
+                Price = 9.99 * i,
+                CategoryId = "echo",
+                Stock = 100,
+            });
+        }
+
+        return Task.FromResult(response);
+    }
 }
 
