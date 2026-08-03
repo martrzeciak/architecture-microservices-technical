@@ -21,12 +21,18 @@ builder.Services.AddHealthChecks()
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    {
+        var origins = builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:4200";
+        if (origins == "*")
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.WithOrigins(origins.Split(','))
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+    });
 });
 
-builder.Services.AddDbContext<OrdersDbContext>(options =>
+builder.Services.AddDbContextPool<OrdersDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
     {
         npgsqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);

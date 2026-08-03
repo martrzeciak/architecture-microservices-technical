@@ -443,3 +443,17 @@
   .charts-section { grid-template-columns: 1fr; }
 }
 
+
+.cache-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  letter-spacing: 0.03em;
+}
+.cache-tag.cold {
+  background: #e3f2fd;
+  color: #0d47a1;
+}

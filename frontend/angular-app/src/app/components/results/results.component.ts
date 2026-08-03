@@ -34,6 +34,7 @@ export interface Summary {
   vu: number | null;
   pageSize: number | null;
   tls: boolean;
+  cold: boolean;
   created: string;
   metrics: SummaryMetrics | null;
 }
@@ -44,6 +45,8 @@ const PROTOCOL_COLORS: Record<string, string> = {
   'REST':              '#3f51b5',
   'gRPC-Web/Envoy':   '#9c27b0',
   'gRPC-Web/Direct':  '#2e7d32',
+  'gRPC Native':      '#e65100',
+  'gRPC Stream':      '#00695c',
 };
 
 @Component({
@@ -62,6 +65,7 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
   filterVu      = signal<number | 'all'>('all');
   filterPs      = signal<number | 'all'>('all');
   filterTls     = signal<'all' | 'yes' | 'no'>('all');
+  filterCache   = signal<'all' | 'warm' | 'cold'>('all');
 
   selectedFiles = signal<Set<string>>(new Set());
 
@@ -135,6 +139,8 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.filterPs() !== 'all')      data = data.filter(s => s.pageSize === this.filterPs());
     if (this.filterTls() === 'yes')     data = data.filter(s => s.tls);
     if (this.filterTls() === 'no')      data = data.filter(s => !s.tls);
+    if (this.filterCache() === 'warm')  data = data.filter(s => !s.cold);
+    if (this.filterCache() === 'cold')  data = data.filter(s => s.cold);
     return data;
   });
 
@@ -200,7 +206,7 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     const labels = cmp.map(s => {
       const proto = s.protocol ?? s.scenarioName;
-      const tags = [s.vu ? `VU${s.vu}` : '', s.pageSize ? `PS${s.pageSize}` : '', s.tls ? 'TLS' : ''].filter(Boolean).join(' ');
+      const tags = [s.vu ? `VU${s.vu}` : '', s.pageSize ? `PS${s.pageSize}` : '', s.tls ? 'TLS' : '', s.cold ? 'COLD' : ''].filter(Boolean).join(' ');
       return tags ? `${proto}\n${tags}` : proto;
     });
     const colors = cmp.map(s => this.protocolColor(s.protocol));

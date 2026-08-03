@@ -9,18 +9,20 @@
 #   .\run-all.ps1 -Runs 3
 
 param(
-    [int[]]$VuLevels   = @(10, 50, 100),
+    [int[]]$VuLevels   = @(10, 50, 100, 500),
     [int[]]$PageSizes  = @(10, 50, 100, 200),
     [int[]]$OrderItems = @(1, 5, 10),
+    [int[]]$CacheStates = @(0, 1),
     [int]$Runs         = 1,
     [string]$ResultsDir = "$PSScriptRoot\results"
 )
 
-# product scenarios — loop over PAGE_SIZE
+# product scenarios — loop over PAGE_SIZE × CACHE_STATE
 $productScenarios = @(
     "scenario-products-rest",
     "scenario-products-grpc-envoy",
-    "scenario-products-grpc-direct"
+    "scenario-products-grpc-direct",
+    "scenario-products-grpc-native"
 )
 
 # streaming scenario — only loops over VU levels
@@ -32,7 +34,8 @@ $streamScenarios = @(
 $orderScenarios = @(
     "scenario-orders-rest",
     "scenario-orders-grpc-envoy",
-    "scenario-orders-grpc-direct"
+    "scenario-orders-grpc-direct",
+    "scenario-orders-grpc-native"
 )
 
 $DOCKER_NETWORK    = 'architecture-microservices-technical_default'
@@ -52,7 +55,7 @@ $dockerResultsDir = ConvertTo-DockerPath (Resolve-Path $ResultsDir)
 $timestamp    = Get-Date -Format "yyyyMMdd_HHmmss"
 $summaryFile  = "$ResultsDir\summary_$timestamp.txt"
 
-$productTests = $productScenarios.Count * $VuLevels.Count * $PageSizes.Count * $Runs
+$productTests = $productScenarios.Count * $VuLevels.Count * $PageSizes.Count * $CacheStates.Count * $Runs
 $streamTests  = $streamScenarios.Count  * $VuLevels.Count * $Runs
 $orderTests   = $orderScenarios.Count   * $VuLevels.Count * $OrderItems.Count * $Runs
 $totalTests   = $productTests + $streamTests + $orderTests
@@ -64,6 +67,7 @@ Add-Content $summaryFile "Docker network: $DOCKER_NETWORK"
 Add-Content $summaryFile "VU levels: $($VuLevels -join ', ')"
 Add-Content $summaryFile "Page sizes (products): $($PageSizes -join ', ')"
 Add-Content $summaryFile "Order items: $($OrderItems -join ', ')"
+Add-Content $summaryFile "Cache states: $($CacheStates | ForEach-Object { if ($_ -eq 1) { 'COLD' } else { 'WARM' } } | Join-String -Separator ', ')"
 Add-Content $summaryFile "Stream category: $STREAM_CATEGORY"
 Add-Content $summaryFile "Runs per scenario: $Runs"
 Add-Content $summaryFile "Total tests: $totalTests"
@@ -116,18 +120,22 @@ function Invoke-K6 {
     }
 }
 
-# --- PRODUKTY: PageSize × VU × Runs × scenariusze ---
+# --- PRODUKTY: CacheState × PageSize × VU × Runs × scenariusze ---
 Write-Host ">>> Produkty ($productTests testow)" -ForegroundColor Yellow
-foreach ($pageSize in $PageSizes) {
-    foreach ($vu in $VuLevels) {
-        foreach ($run in 1..$Runs) {
-            foreach ($scenario in $productScenarios) {
-                $label   = "$scenario | VU=$vu | PS=$pageSize | Run=$run"
-                $jsonFile = "${scenario}_VU${vu}_PS${pageSize}_run${run}_${timestamp}-summary.json"
-                Invoke-K6 -Scenario $scenario -Label $label -JsonFile $jsonFile -EnvVars @{
-                    VU        = $vu
-                    PAGE_SIZE = $pageSize
-                    K6_ENV    = 'docker'
+foreach ($bypass in $CacheStates) {
+    $cacheLabel = if ($bypass -eq 1) { "COLD" } else { "WARM" }
+    foreach ($pageSize in $PageSizes) {
+        foreach ($vu in $VuLevels) {
+            foreach ($run in 1..$Runs) {
+                foreach ($scenario in $productScenarios) {
+                    $label   = "$scenario | VU=$vu | PS=$pageSize | Cache=$cacheLabel | Run=$run"
+                    $jsonFile = "${scenario}_VU${vu}_PS${pageSize}_CACHE${cacheLabel}_run${run}_${timestamp}-summary.json"
+                    Invoke-K6 -Scenario $scenario -Label $label -JsonFile $jsonFile -EnvVars @{
+                        VU           = $vu
+                        PAGE_SIZE    = $pageSize
+                        K6_ENV       = 'docker'
+                        BYPASS_CACHE = $bypass
+                    }
                 }
             }
         }

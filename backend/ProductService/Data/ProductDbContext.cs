@@ -48,7 +48,7 @@ public class ProductDbContext(DbContextOptions<ProductDbContext> options) : DbCo
             new() { Id = "20", Name = "Portable SSD 2TB", Description = "USB-C portable SSD 1050 MB/s", Price = 139.99, CategoryId = "storage", Stock = 65 },
         };
 
-        // Generate 180 additional products for payload variation benchmarks (pageSize=50/100/200)
+        // Generate 480 additional products for payload variation benchmarks (pageSize=50/100/200/500)
         var productTemplates = new[]
         {
             ("Wireless Earbuds {0}", "Bluetooth 5.3 earbuds with ANC", 79.99, "audio"),
@@ -71,8 +71,8 @@ public class ProductDbContext(DbContextOptions<ProductDbContext> options) : DbCo
             ("Drawing Tablet {0}", "Graphics drawing tablet USB", 59.99, "peripherals"),
         };
 
-        var generated = new ProductEntity[180];
-        for (var i = 0; i < 180; i++)
+        var generated = new ProductEntity[480];
+        for (var i = 0; i < 480; i++)
         {
             var template = productTemplates[i % productTemplates.Length];
             var variant = (i / productTemplates.Length) + 1;
@@ -87,7 +87,7 @@ public class ProductDbContext(DbContextOptions<ProductDbContext> options) : DbCo
             };
         }
 
-        var all = new ProductEntity[200];
+        var all = new ProductEntity[500];
         baseProducts.CopyTo(all, 0);
         generated.CopyTo(all, 20);
         return all;

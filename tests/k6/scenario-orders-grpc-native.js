@@ -2,12 +2,13 @@
 import grpc from 'k6/net/grpc';
 import { check, sleep } from 'k6';
 import { Trend, Rate } from 'k6/metrics';
-import { BASE_URLS, makeStages, PACING_MS, ORDER_ITEMS, buildOrderItems } from './config.js';
+import { BASE_URLS, makeStages, PACING_MS, ORDER_ITEMS, buildOrderItems, SUMMARY_TREND_STATS } from './config.js';
 
 const VU_COUNT = __ENV.VU ? parseInt(__ENV.VU) : 50;
 
 export const options = {
   stages: makeStages(VU_COUNT),
+  summaryTrendStats: SUMMARY_TREND_STATS,
   thresholds: {
     grpc_req_duration: ['p(95)<5000', 'p(99)<10000'],
     grpc_native_orders_errors: ['rate<0.05'],

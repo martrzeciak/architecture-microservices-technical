@@ -4,7 +4,7 @@ import { check, sleep } from 'k6';
 import { Trend, Rate } from 'k6/metrics';
 import {
   BASE_URLS, THRESHOLDS, SUMMARY_TREND_STATS, makeStages, PACING_MS, PAGE_SIZE,
-  buildListProductsProto, buildGrpcWebFrame, getHeaders
+  buildListProductsProto, buildGrpcWebFrame, getHeaders, flushCacheIfCold
 } from './config.js';
 
 const VU_COUNT = __ENV.VU ? parseInt(__ENV.VU) : 50;
@@ -21,6 +21,8 @@ const errors  = new Rate('grpc_web_direct_errors');
 
 const requestProto = buildListProductsProto(PAGE_SIZE);
 const grpcWebBody = buildGrpcWebFrame(requestProto);
+
+export function setup() { flushCacheIfCold(); }
 
 export default function () {
   const res = http.post(

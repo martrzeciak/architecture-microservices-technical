@@ -59,6 +59,14 @@
               <option value="no">Nie</option>
             </select>
           </label>
+          <label>
+            Cache
+            <select [value]="filterCache()" (change)="filterCache.set($any($event.target).value)">
+              <option value="all">Wszystkie</option>
+              <option value="warm">WARM</option>
+              <option value="cold">COLD</option>
+            </select>
+          </label>
         </div>
 
         <!-- Akcje zaznaczania -->
@@ -91,6 +99,7 @@
                   VU {{ s.vu }}
                   @if (s.pageSize) { · PS {{ s.pageSize }} }
                   @if (s.tls) { · 🔒TLS }
+                  · <span class="cache-tag" [class.cold]="s.cold">{{ s.cold ? 'COLD' : 'WARM' }}</span>
                   · {{ s.created | date:'dd.MM HH:mm' }}
                 </span>
               </div>
@@ -111,7 +120,7 @@
       <!-- PRAWA: wykresy + karty porównawcze -->
       <main class="compare-panel">
 
-        <!-- Wykresy — zawsze na górze prawej kolumny -->
+        <!-- Wykresy — nad kartami -->
         <div class="charts-section">
           <div class="chart-box">
             <h3>Przepustowość (req/s)</h3>
@@ -224,6 +233,7 @@
             }
           </div>
         }
+
       </main>
 
     </div>

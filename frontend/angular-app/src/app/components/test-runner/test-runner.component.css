@@ -381,6 +381,7 @@
 }
 
 .last-result.success { background: #e8f5e9; color: #1b5e20; }
+.last-result.warn    { background: #fff8e1; color: #8a6d00; }
 .last-result.fail    { background: #ffebee; color: #b71c1c; }
 
 .result-filename {
@@ -554,10 +555,24 @@
 .tls-label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #ddd;
+  color: #333;
 }
 
 .batch-buttons { display: flex; gap: 8px; }
 .batch-buttons button { flex: 1; }
 .run-all-btn.matrix { background: #673ab7; }
 .run-all-btn.matrix:hover:not(:disabled) { background: #5e35b1; }
+
+.cache-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  letter-spacing: 0.04em;
+}
+.cache-badge.cold {
+  background: #e3f2fd;
+  color: #0d47a1;
+}

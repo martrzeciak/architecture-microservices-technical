@@ -1,5 +1,6 @@
 // Shared config for all k6 scenarios.
 // Set K6_ENV=docker to use Docker service names instead of localhost.
+import http from 'k6/http';
 
 const isDocker = __ENV.K6_ENV === 'docker';
 
@@ -54,6 +55,16 @@ export const STREAM_CATEGORY = __ENV.STREAM_CATEGORY || 'electronics';
 
 // skip the cache when this flag is set
 export const BYPASS_CACHE = __ENV.BYPASS_CACHE === '1';
+
+// call before cold-cache test runs to ensure Redis is empty
+export function flushCacheIfCold() {
+  if (!BYPASS_CACHE) return;
+  const base = isDocker ? 'http://product-service:5000' : 'http://localhost:5000';
+  const res = http.post(`${base}/admin/cache/flush`, null);
+  if (res.status !== 200) {
+    console.warn(`Cache flush failed: ${res.status}`);
+  }
+}
 
 export function getHeaders() {
   const headers = {};

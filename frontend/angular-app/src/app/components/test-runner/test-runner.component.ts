@@ -10,6 +10,7 @@ interface Scenario {
   protocol: 'REST' | 'gRPC-Web/Envoy' | 'gRPC-Web/Direct';
   service: string;
   file: string;
+  paramType?: 'pageSize' | 'orderItems' | 'streamCategory';
 }
 
 interface ResultFile {
@@ -18,6 +19,7 @@ interface ResultFile {
   vu: number | null;
   pageSize: number | null;
   tls: boolean;
+  cold: boolean;
   size: number;
   created: string;
 }
@@ -44,6 +46,7 @@ interface LogEvent {
 const RUNNER_URL = 'http://localhost:3100';
 const VU_OPTIONS = [10, 50, 100, 500];
 const TEST_DURATION_SEC = 160; // 30s warmup + 120s steady + 10s cooldown
+const BATCH_COOLDOWN_SEC = 30; // przerwa między przebiegami w trybie wsadowym — zgodna z run-all.ps1
 
 const PROTOCOL_COLORS: Record<string, string> = {
   'REST': 'badge-rest',
@@ -64,6 +67,7 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
   logs         = signal<string[]>([]);
   running      = signal(false);
   lastExitCode = signal<number | null>(null);
+  lastSuccess  = signal<boolean | null>(null);
   lastResultFile  = signal<string | null>(null);
   lastSummaryFile = signal<string | null>(null);
   serverError  = signal(false);
@@ -87,12 +91,14 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
   selectedScenarioId = signal<string | null>(null);
   selectedVu         = signal(50);
   selectedPageSize   = signal(10);
+  selectedOrderItems = signal(1);
   restTls            = signal(false);
   bypassCache        = signal(false);
 
-  readonly vuOptions       = VU_OPTIONS;
-  readonly pageSizeOptions = [10, 50, 100, 200, 500];
-  readonly protocolColors  = PROTOCOL_COLORS;
+  readonly vuOptions        = VU_OPTIONS;
+  readonly pageSizeOptions  = [10, 50, 100, 200, 500];
+  readonly orderItemsOptions = [1, 5, 10];
+  readonly protocolColors   = PROTOCOL_COLORS;
 
   private currentReader: ReadableStreamDefaultReader | null = null;
 
@@ -180,6 +186,7 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
     this.running.set(true);
     this.logs.set([]);
     this.lastExitCode.set(null);
+    this.lastSuccess.set(null);
     this.lastResultFile.set(null);
     this.lastSummaryFile.set(null);
     this.quickSummary.set(null);
@@ -200,6 +207,7 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
         scenarioId: sid,
         vu: runVu,
         pageSize: this.selectedPageSize(),
+        orderItems: this.selectedOrderItems(),
         restTls: this.restTls(),
         bypassCache: this.bypassCache(),
       }),
@@ -232,6 +240,7 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
               } else if (event.type === 'done') {
                 const d = event.data as { code: number; resultFile: string; summaryFile: string; success: boolean };
                 this.lastExitCode.set(d.code);
+                this.lastSuccess.set(d.success);
                 this.lastResultFile.set(d.resultFile);
                 this.lastSummaryFile.set(d.summaryFile);
                 if (d.success && d.summaryFile) this.fetchQuickSummary(d.summaryFile);
@@ -260,7 +269,7 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
       this.runAllQueue.set(queue);
       
       if (queue.length > 0) {
-        setTimeout(() => this.startNextInQueue(), 3000); // 3s pause between runs
+        setTimeout(() => this.startNextInQueue(), BATCH_COOLDOWN_SEC * 1000); // cooldown spójny z run-all.ps1
       } else {
         this.runAllActive.set(false);
         this.matrixMode.set(false);
@@ -274,8 +283,10 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
         const metrics = raw['metrics'] as Record<string, Record<string, number>> | undefined;
         // gRPC native uses grpc_req_duration, others use http_req_duration
         const dur  = metrics?.['http_req_duration'] ?? metrics?.['grpc_req_duration'];
-        const fail = metrics?.['http_req_failed'] ?? metrics?.['grpc_stream_errors'];
-        const reqs = metrics?.['http_reqs'] ?? metrics?.['grpc_reqs'];
+        const fail = metrics?.['http_req_failed'] ?? metrics?.['grpc_stream_errors']
+                  ?? metrics?.['grpc_native_products_errors'] ?? metrics?.['grpc_native_orders_errors'];
+        // native gRPC has no http_reqs/grpc_reqs; fall back to iterations (1 invoke per iteration)
+        const reqs = metrics?.['http_reqs'] ?? metrics?.['grpc_reqs'] ?? metrics?.['iterations'];
         this.quickSummary.set({
           reqsPerSec: reqs?.['rate'] ?? null,
           avg:        dur?.['avg'] ?? null,
@@ -313,7 +324,7 @@ export class TestRunnerComponent implements OnInit, OnDestroy {
 
     // Create a queue of [scenarioId, vu] pairs
     const queue: string[] = [];
-    for (const vu of [10, 50, 100]) {
+    for (const vu of [10, 50, 100, 500]) {
       for (const id of ids) {
         queue.push(`${id}|${vu}`);
       }

@@ -2,12 +2,13 @@
 import grpc from 'k6/net/grpc';
 import { check, sleep } from 'k6';
 import { Trend, Rate } from 'k6/metrics';
-import { BASE_URLS, makeStages, PACING_MS, PAGE_SIZE } from './config.js';
+import { BASE_URLS, makeStages, PACING_MS, PAGE_SIZE, BYPASS_CACHE, SUMMARY_TREND_STATS, flushCacheIfCold } from './config.js';
 
 const VU_COUNT = __ENV.VU ? parseInt(__ENV.VU) : 50;
 
 export const options = {
   stages: makeStages(VU_COUNT),
+  summaryTrendStats: SUMMARY_TREND_STATS,
   thresholds: {
     grpc_req_duration: ['p(95)<5000', 'p(99)<10000'],
     grpc_native_products_errors: ['rate<0.05'],
@@ -20,15 +21,19 @@ const errors  = new Rate('grpc_native_products_errors');
 const client = new grpc.Client();
 client.load(['./protos'], 'product.proto');
 
+export function setup() { flushCacheIfCold(); }
+
 export default function () {
   if (__ITER === 0) {
     client.connect(BASE_URLS.productGrpc, { plaintext: true, timeout: '10s' });
   }
 
+  const metadata = BYPASS_CACHE ? { 'x-bypass-cache': 'true' } : {};
   const startTime = Date.now();
   const res = client.invoke(
     'product.ProductService/ListProducts',
     { page: 1, page_size: PAGE_SIZE },
+    { metadata },
   );
   const duration = Date.now() - startTime;
 

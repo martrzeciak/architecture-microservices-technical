@@ -67,19 +67,35 @@
         </div>
       </section>
 
-      <!-- Wybór PAGE_SIZE -->
-      <section class="config-section">
-        <h3>Rozmiar strony (PAGE_SIZE)</h3>
-        <div class="vu-selector">
-          @for (ps of pageSizeOptions; track ps) {
-            <button
-              class="vu-btn"
-              [class.active]="selectedPageSize() === ps"
-              (click)="selectedPageSize.set(ps)"
-            >{{ ps }}</button>
-          }
-        </div>
-      </section>
+      @if (selectedScenario()?.paramType === 'pageSize') {
+        <section class="config-section">
+          <h3>Rozmiar strony (PAGE_SIZE)</h3>
+          <div class="vu-selector">
+            @for (ps of pageSizeOptions; track ps) {
+              <button
+                class="vu-btn"
+                [class.active]="selectedPageSize() === ps"
+                (click)="selectedPageSize.set(ps)"
+              >{{ ps }}</button>
+            }
+          </div>
+        </section>
+      }
+
+      @if (selectedScenario()?.paramType === 'orderItems') {
+        <section class="config-section">
+          <h3>Liczba pozycji zamówienia (ORDER_ITEMS)</h3>
+          <div class="vu-selector">
+            @for (oi of orderItemsOptions; track oi) {
+              <button
+                class="vu-btn"
+                [class.active]="selectedOrderItems() === oi"
+                (click)="selectedOrderItems.set(oi)"
+              >{{ oi }}</button>
+            }
+          </div>
+        </section>
+      }
 
       <!-- TLS toggle (tylko dla REST) -->
       @if (isRestScenario()) {
@@ -145,7 +161,7 @@
             class="run-all-btn matrix"
             [disabled]="running() || serverError()"
             (click)="runMatrix()"
-            title="Uruchom Macierz: Wszystkie scenariusze x VU [10, 50, 100]"
+            title="Uruchom Macierz: Wszystkie scenariusze x VU [10, 50, 100, 500]"
           >
             @if (runAllActive() && matrixMode()) {
               <span class="spinner"></span> Macierz ({{ runAllQueue().length }})
@@ -162,10 +178,13 @@
 
       <!-- Wynik ostatniego testu -->
       @if (lastExitCode() !== null) {
-        <div class="last-result" [class.success]="lastExitCode() === 0" [class.fail]="lastExitCode() !== 0">
-          @if (lastExitCode() === 0) { ✅ Test zakończony pomyślnie }
-          @else { ❌ Test zakończony błędem (kod {{ lastExitCode() }}) }
-        </div>
+        @if (lastExitCode() === 0) {
+          <div class="last-result success">✅ Test zakończony pomyślnie</div>
+        } @else if (lastSuccess()) {
+          <div class="last-result warn">⚠️ Progi przekroczone — dane zapisane (kod {{ lastExitCode() }})</div>
+        } @else {
+          <div class="last-result fail">❌ Test zakończony błędem (kod {{ lastExitCode() }})</div>
+        }
       }
 
       <!-- Quick summary po teście -->
@@ -252,6 +271,7 @@
                 <th>Scenariusz</th>
                 <th>VU</th>
                 <th>PS</th>
+                <th>Cache</th>
                 <th>TLS</th>
                 <th>Rozmiar</th>
                 <th>Data</th>
@@ -264,6 +284,7 @@
                   <td>{{ r.scenario }}</td>
                   <td>{{ r.vu }}</td>
                   <td>{{ r.pageSize ?? '-' }}</td>
+                  <td><span class="cache-badge" [class.cold]="r.cold">{{ r.cold ? 'COLD' : 'WARM' }}</span></td>
                   <td>{{ r.tls ? '🔒' : '-' }}</td>
                   <td>{{ formatSize(r.size) }}</td>
                   <td>{{ r.created | date:'dd.MM.yy HH:mm' }}</td>

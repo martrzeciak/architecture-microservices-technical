@@ -1,0 +1,131 @@
+# Production override for Hetzner Cloud CX42 (8 vCPU, 16 GB RAM).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Changes vs base:
+#   - Raised resource limits (no reservations)
+#   - Added angular and runner containers
+#   - PostgreSQL tuned for 16 GB host
+
+services:
+  postgres:
+    command: >-
+      postgres
+        -c max_connections=500
+        -c shared_buffers=1GB
+        -c effective_cache_size=4GB
+        -c work_mem=16MB
+        -c maintenance_work_mem=256MB
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+
+  product-service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - CORS_ORIGINS=*
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 3G
+
+  order-service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - CORS_ORIGINS=*
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 3G
+
+  envoy:
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 1G
+
+  prometheus:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  grafana:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  rabbitmq:
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+
+  jaeger:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  # --- NEW: Angular frontend (nginx + static build) ---
+  angular:
+    build:
+      context: ./frontend/angular-app
+      dockerfile: Dockerfile
+      args:
+        - API_REST_URL=http://HOST_IP:5000
+        - API_GRPC_ENVOY_URL=http://HOST_IP:8080
+        - API_GRPC_DIRECT_URL=https://HOST_IP:5002
+        - RUNNER_URL=http://HOST_IP:3100
+    ports:
+      - "4200:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    depends_on:
+      product-service:
+        condition: service_healthy
+
+  # --- NEW: k6 Runner Server (Express.js) ---
+  runner:
+    build:
+      context: ./tests/runner
+      dockerfile: Dockerfile
+    ports:
+      - "3100:3100"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./tests/k6:/app/k6-scripts
+      - ./tests/k6/results:/app/k6-results
+    environment:
+      - K6_SCRIPTS_DIR=/app/k6-scripts
+      - K6_RESULTS_DIR=/app/k6-results
+      - DOCKER_NETWORK=architecture-microservices-technical_default
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    depends_on:
+      product-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy

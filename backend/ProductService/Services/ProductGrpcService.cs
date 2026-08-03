@@ -1,23 +1,38 @@
 using EShop.ProductService;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using ProductService.Data;
+using System.Text.Json;
 
 namespace ProductService.Services;
 
-public class ProductGrpcService(ProductDbContext db) : EShop.ProductService.ProductService.ProductServiceBase
+public class ProductGrpcService(ProductDbContext db, IDistributedCache cache) : EShop.ProductService.ProductService.ProductServiceBase
 {
     public override async Task<ListProductsResponse> ListProducts(ListProductsRequest request, ServerCallContext context)
     {
-        var query = db.Products.AsNoTracking().AsQueryable();
+        var pageSize = request.PageSize > 0 ? request.PageSize : 10;
+        var page = request.Page > 0 ? request.Page : 1;
+        bool bypassCache = context.RequestHeaders.Get("x-bypass-cache") != null;
+        string cacheKey = $"products_{request.CategoryId}_{page}_{pageSize}";
 
+        if (!bypassCache)
+        {
+            var cached = await cache.GetStringAsync(cacheKey, context.CancellationToken);
+            if (!string.IsNullOrEmpty(cached))
+            {
+                var cachedResponse = JsonSerializer.Deserialize<CachedProductList>(cached)!;
+                var hit = new ListProductsResponse { TotalCount = cachedResponse.TotalCount };
+                hit.Products.AddRange(cachedResponse.Products);
+                return hit;
+            }
+        }
+
+        var query = db.Products.AsNoTracking().AsQueryable();
         if (!string.IsNullOrEmpty(request.CategoryId))
             query = query.Where(p => p.CategoryId == request.CategoryId);
 
         var totalCount = await query.CountAsync(context.CancellationToken);
-        var pageSize = request.PageSize > 0 ? request.PageSize : 10;
-        var page = request.Page > 0 ? request.Page : 1;
-
         var entities = await query
             .OrderBy(e => e.Id)
             .Skip((page - 1) * pageSize)
@@ -26,8 +41,16 @@ public class ProductGrpcService(ProductDbContext db) : EShop.ProductService.Prod
 
         var response = new ListProductsResponse { TotalCount = totalCount };
         response.Products.AddRange(entities.Select(e => e.ToProto()));
+
+        await cache.SetStringAsync(cacheKey,
+            JsonSerializer.Serialize(new CachedProductList(response.Products, totalCount)),
+            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) },
+            context.CancellationToken);
+
         return response;
     }
+
+    private record CachedProductList(IEnumerable<Product> Products, int TotalCount);
 
     public override async Task<Product> GetProduct(GetProductRequest request, ServerCallContext context)
     {
@@ -63,8 +86,6 @@ public class ProductGrpcService(ProductDbContext db) : EShop.ProductService.Prod
         await foreach (var entity in query.AsAsyncEnumerable().WithCancellation(context.CancellationToken))
         {
             await responseStream.WriteAsync(entity.ToProto());
-            // simulate some processing delay per item
-            await Task.Delay(100, context.CancellationToken);
         }
     }
 }

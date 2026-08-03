@@ -1,3 +1,4 @@
+using EShop.ProductService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using OpenTelemetry.Metrics;
@@ -5,6 +6,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using ProductService.Data;
 using ProductService.Services;
+using StackExchange.Redis;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,9 +22,15 @@ builder.Services.AddHealthChecks()
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    {
+        var origins = builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:4200";
+        if (origins == "*")
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.WithOrigins(origins.Split(','))
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+    });
 });
 
 // use a pool of db contexts instead of creating a new one per request
@@ -34,6 +42,9 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
     options.InstanceName = "ProductService_";
 });
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!));
 
 // set up metrics and tracing
 var resourceBuilder = ResourceBuilder.CreateDefault().AddService("ProductService");
@@ -79,6 +90,14 @@ app.MapGrpcService<ProductGrpcService>().EnableGrpcWeb();
 app.MapPrometheusScrapingEndpoint();
 app.MapHealthChecks("/healthz/live");
 app.MapHealthChecks("/healthz/ready");
+
+app.MapPost("/admin/cache/flush", async (IConnectionMultiplexer redis) =>
+{
+    // Used by k6 setup() before cold-cache test runs to ensure deterministic state
+    var db = redis.GetDatabase();
+    await db.ExecuteAsync("FLUSHDB");
+    return Results.Ok(new { flushed = true });
+});
 
 app.MapGet("/api/products", async (HttpContext context, ProductDbContext db, IDistributedCache cache, string? categoryId, int page = 1, int pageSize = 10) =>
 {
