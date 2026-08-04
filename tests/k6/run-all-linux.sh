@@ -14,16 +14,20 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RESULTS_DIR="$SCRIPT_DIR/results"
 DOCKER_NETWORK="architecture-microservices-technical_default"
-COOLDOWN_SECONDS=30
+COOLDOWN_SECONDS=20
 STREAM_CATEGORY="electronics"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
+# Logging (defined early so they can be used during argument parsing)
+log() { echo "[$(date +%H:%M:%S)] $1"; }
+log_color() { echo -e "[$(date +%H:%M:%S)] \033[${1}m${2}\033[0m"; }
+
 # Defaults
-VU_LEVELS=(10 50 100 500)
-PAGE_SIZES=(10 50 100 200)
-ORDER_ITEMS=(1 5 10)
+VU_LEVELS=(10 100 500)
+PAGE_SIZES=(10 100 200)
+ORDER_ITEMS=(1 10)
 CACHE_STATES=(0 1)
-RUNS=3
+RUNS=2
 
 # Parse arguments
 QUICK=false
@@ -33,10 +37,19 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --quick)
       QUICK=true
-      VU_LEVELS=(10 100)
-      PAGE_SIZES=(10 100)
-      ORDER_ITEMS=(1 5)
+      VU_LEVELS=(10 500)
+      PAGE_SIZES=(10 200)
+      ORDER_ITEMS=(1 10)
       CACHE_STATES=(0 1)
+      RUNS=1
+      shift
+      ;;
+    --smoke)
+      QUICK=true
+      VU_LEVELS=(100)
+      PAGE_SIZES=(100)
+      ORDER_ITEMS=(1)
+      CACHE_STATES=(0)
       RUNS=1
       shift
       ;;
@@ -134,10 +147,6 @@ COMPLETED=0
 mkdir -p "$RESULTS_DIR"
 SUMMARY_FILE="$RESULTS_DIR/summary_${TIMESTAMP}.txt"
 
-# Logging
-log() { echo "[$(date +%H:%M:%S)] $1"; }
-log_color() { echo -e "[$(date +%H:%M:%S)] \033[${1}m${2}\033[0m"; }
-
 # Summary header
 cat >> "$SUMMARY_FILE" <<EOF
 eShop Performance Benchmark — REST vs gRPC-Web vs Native gRPC
@@ -150,14 +159,14 @@ Cache states: $(for s in "${CACHE_STATES[@]}"; do [[ $s == 1 ]] && echo -n "COLD
 Stream category: $STREAM_CATEGORY
 Runs per scenario: $RUNS
 Total tests: $TOTAL_TESTS
-Stages: 30s warmup + 120s steady + 10s cooldown = 160s
+Stages: 20s warmup + 90s steady + 10s cooldown = 120s
 ==================================================
 EOF
 
 echo ""
 log_color "36" "=== eShop Performance Benchmark ==="
 echo "VU: [${VU_LEVELS[*]}] | PageSize: [${PAGE_SIZES[*]}] | OrderItems: [${ORDER_ITEMS[*]}] | Runs: $RUNS"
-ESTIMATED_MIN=$(( TOTAL_TESTS * (160 + COOLDOWN_SECONDS) / 60 ))
+ESTIMATED_MIN=$(( TOTAL_TESTS * (120 + COOLDOWN_SECONDS) / 60 ))
 echo "Total: $TOTAL_TESTS tests, ~${ESTIMATED_MIN} minutes"
 echo ""
 

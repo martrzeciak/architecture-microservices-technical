@@ -35,11 +35,12 @@ error() { echo -e "${RED}[$(date +%H:%M:%S)] ✗ $1${NC}"; exit 1; }
 # --- Validate BACKEND_IP ---
 if [ -z "$BACKEND_IP" ]; then
   error "BACKEND_IP is not set. Export it before running:
-  export BACKEND_IP=168.119.x.x
+  export BACKEND_IP=10.0.0.2   # Private Network IP of the backend server
   ./deploy-loadgen.sh"
 fi
 
 log "Load Generator setup for backend at: $BACKEND_IP"
+log "(Use Private Network IP for best results — e.g. 10.0.0.2)"
 
 # --- Step 1: Install Docker ---
 log "Step 1: Installing Docker CE..."
@@ -72,7 +73,20 @@ apt-get install -y -qq git tmux htop curl
 ok "Tools installed"
 
 # --- Step 3: Clone repository (only need tests/k6 dir, but clone all) ---
-log "Step 3: Cloning repository..."
+log "Step 3: Creating swap (safety for 500 VU on 2GB RAM)..."
+if [ ! -f /swapfile ]; then
+  fallocate -l 2G /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  ok "2GB swap enabled"
+else
+  ok "Swap already exists"
+fi
+
+# --- Step 4: Clone repository ---
+log "Step 4: Cloning repository..."
 
 if [ -d "$REPO_DIR" ]; then
   warn "Directory exists. Pulling latest..."
@@ -84,16 +98,16 @@ else
 fi
 ok "Repository ready"
 
-# --- Step 4: Pre-pull k6 image ---
-log "Step 4: Pulling k6 Docker image..."
+# --- Step 5: Pre-pull k6 image ---
+log "Step 5: Pulling k6 Docker image..."
 docker pull grafana/k6:latest
 ok "k6 image ready"
 
-# --- Step 5: Make scripts executable ---
+# --- Step 6: Make scripts executable ---
 chmod +x tests/k6/run-all-linux.sh
 
-# --- Step 6: Verify connectivity to backend ---
-log "Step 5: Checking connectivity to backend ($BACKEND_IP)..."
+# --- Step 7: Verify connectivity to backend ---
+log "Step 7: Checking connectivity to backend ($BACKEND_IP)..."
 
 check_port() {
   local port=$1
@@ -121,16 +135,19 @@ echo -e "  Backend IP: ${CYAN}$BACKEND_IP${NC}"
 echo ""
 echo -e "  ${YELLOW}Quick smoke test:${NC}"
 echo -e "    cd $REPO_DIR/tests/k6"
-echo -e "    ./run-all-linux.sh --remote --backend-ip $BACKEND_IP --quick --runs 1"
+echo -e "    ./run-all-linux.sh --remote --backend-ip $BACKEND_IP --smoke"
 echo ""
-echo -e "  ${YELLOW}Full benchmark (3 runs, ~30 hours):${NC}"
+echo -e "  ${YELLOW}Full benchmark (2 runs, ~10.5 hours):${NC}"
 echo -e "    tmux new -s bench"
 echo -e "    cd $REPO_DIR/tests/k6"
 echo -e "    ./run-all-linux.sh --remote --backend-ip $BACKEND_IP"
 echo -e "    # Ctrl+B, D to detach"
 echo ""
-echo -e "  ${YELLOW}Reduced benchmark (1 run, ~10 hours):${NC}"
+echo -e "  ${YELLOW}Single run (~5.5 hours):${NC}"
 echo -e "    ./run-all-linux.sh --remote --backend-ip $BACKEND_IP --runs 1"
+echo ""
+echo -e "  ${YELLOW}NOTE:${NC} Use Private Network IP (10.x.x.x) for BACKEND_IP"
+echo -e "        to isolate benchmark traffic from public internet."
 echo ""
 echo -e "  ${YELLOW}Download results to local machine:${NC}"
 echo -e "    scp -r root@$(curl -4 -s ifconfig.me):$REPO_DIR/tests/k6/results/ ./hetzner-results/"

@@ -91,11 +91,11 @@ export function getHeaders() {
   return headers;
 }
 
-// warmup 30s → steady 120s → cooldown 10s
+// warmup 20s → steady 90s → cooldown 10s = 120s total
 export function makeStages(targetVU) {
   return [
-    { duration: '30s', target: targetVU },   // ramp up
-    { duration: '120s', target: targetVU },  // measure
+    { duration: '20s', target: targetVU },   // ramp up
+    { duration: '90s', target: targetVU },   // measure
     { duration: '10s', target: 0 },          // ramp down
   ];
 }
