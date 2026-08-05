@@ -1,0 +1,82 @@
+{
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "no stream error": {
+                    "name": "no stream error",
+                    "path": "::no stream error",
+                    "id": "03be78e5feaa5702d0334ad91a07ff82",
+                    "passes": 516965,
+                    "fails": 0
+                }
+            },
+        "name": ""
+    },
+    "metrics": {
+        "grpc_streams_msgs_sent": {
+            "count": 516965,
+            "rate": 4307.560421062731
+        },
+        "grpc_streams_msgs_received": {
+            "count": 4135720,
+            "rate": 34460.483368501846
+        },
+        "iteration_duration": {
+            "min": 10.081561,
+            "med": 82.834472,
+            "max": 402.782743,
+            "p(90)": 182.809163,
+            "p(95)": 211.2448758,
+            "avg": 96.34443947154328
+        },
+        "iterations": {
+            "count": 516965,
+            "rate": 4307.560421062731
+        },
+        "vus_max": {
+            "value": 500,
+            "min": 500,
+            "max": 500
+        },
+        "grpc_req_duration": {
+            "p(95)": 186.43237299999998,
+            "avg": 81.5104570105494,
+            "min": 0.964032,
+            "med": 69.766874,
+            "max": 390.846621,
+            "p(90)": 159.6933318000001,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        },
+        "data_sent": {
+            "count": 43594304,
+            "rate": 363245.2844857518
+        },
+        "data_received": {
+            "count": 336964184,
+            "rate": 2807721.1848270185
+        },
+        "vus": {
+            "min": 17,
+            "max": 500,
+            "value": 17
+        },
+        "grpc_streams": {
+            "count": 516965,
+            "rate": 4307.560421062731
+        },
+        "checks": {
+            "passes": 516965,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_stream_errors": {
+            "passes": 0,
+            "fails": 516965,
+            "value": 0
+        }
+    }
+}

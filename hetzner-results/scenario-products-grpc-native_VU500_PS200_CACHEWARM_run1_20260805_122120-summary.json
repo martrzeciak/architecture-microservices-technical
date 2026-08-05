@@ -1,0 +1,92 @@
+{
+    "metrics": {
+        "grpc_req_duration": {
+            "p(95)": 746.0924664,
+            "p(99)": 847.6058934400002,
+            "avg": 501.01920656737974,
+            "min": 1.371184,
+            "med": 540.047905,
+            "max": 1281.015801,
+            "p(90)": 694.6703030000001,
+            "thresholds": {
+                "p(99)<10000": false,
+                "p(95)<5000": false
+            }
+        },
+        "checks": {
+            "passes": 198154,
+            "fails": 0,
+            "value": 1
+        },
+        "iterations": {
+            "count": 99077,
+            "rate": 825.583437014719
+        },
+        "vus_max": {
+            "value": 500,
+            "min": 500,
+            "max": 500
+        },
+        "iteration_duration": {
+            "p(95)": 791.5114412,
+            "p(99)": 917.640059400001,
+            "avg": 530.2164966171918,
+            "min": 12.281763,
+            "med": 562.506446,
+            "max": 1642.573153,
+            "p(90)": 738.6996714
+        },
+        "vus": {
+            "value": 21,
+            "min": 16,
+            "max": 500
+        },
+        "grpc_native_products_errors": {
+            "passes": 0,
+            "fails": 99077,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "data_sent": {
+            "rate": 61350.18954475028,
+            "count": 7362542
+        },
+        "grpc_native_products_latency": {
+            "avg": 504.6334971789618,
+            "min": 2,
+            "med": 543,
+            "max": 1317,
+            "p(90)": 701,
+            "p(95)": 753,
+            "p(99)": 865
+        },
+        "data_received": {
+            "count": 1490466468,
+            "rate": 12419677.9212797
+        }
+    },
+    "root_group": {
+        "checks": {
+            "status OK": {
+                "name": "status OK",
+                "path": "::status OK",
+                "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                "passes": 99077,
+                "fails": 0
+            },
+            "has products": {
+                "name": "has products",
+                "path": "::has products",
+                "id": "bd20344dacb9319039907d7c96ed89b0",
+                "passes": 99077,
+                "fails": 0
+            }
+        },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {}
+    }
+}

@@ -1,0 +1,147 @@
+eShop Performance Benchmark — REST vs gRPC-Web vs Native gRPC
+Date: Wed Aug  5 12:21:20 PM UTC 2026
+Docker network: 
+VU levels: 10 100 500
+Page sizes (products): 10 100 200
+Order items: 1 10
+Cache states: WARM COLD 
+Stream category: electronics
+Runs per scenario: 1
+Total tests: 135
+Stages: 20s warmup + 90s steady + 10s cooldown = 120s
+==================================================
+OK   | scenario-products-rest | VU=10 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=10 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=10 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=10 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=100 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=100 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=100 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=100 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=500 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=500 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=500 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=500 | PS=10 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=10 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=10 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=10 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=10 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=100 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=100 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=100 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=100 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=500 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=500 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=500 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=500 | PS=100 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=10 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=10 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=10 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=10 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=100 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=100 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=100 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=100 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=500 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-envoy | VU=500 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-direct | VU=500 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-grpc-native | VU=500 | PS=200 | Cache=WARM | Run=1
+OK   | scenario-products-rest | VU=10 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=10 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=10 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=10 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=100 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=100 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=100 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=100 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=500 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=500 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=500 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=500 | PS=10 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=10 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=10 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=10 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=10 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=100 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=100 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=100 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=100 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=500 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=500 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=500 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=500 | PS=100 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=10 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=10 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=10 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=10 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=100 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=100 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=100 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=100 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-rest | VU=500 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-envoy | VU=500 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-direct | VU=500 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-native | VU=500 | PS=200 | Cache=COLD | Run=1
+OK   | scenario-products-grpc-stream | VU=10 | CAT=electronics | Run=1
+OK   | scenario-products-grpc-stream | VU=100 | CAT=electronics | Run=1
+OK   | scenario-products-grpc-stream | VU=500 | CAT=electronics | Run=1
+OK   | scenario-orders-rest | VU=10 | OI=1 | Run=1
+OK   | scenario-orders-grpc-envoy | VU=10 | OI=1 | Run=1
+OK   | scenario-orders-grpc-direct | VU=10 | OI=1 | Run=1
+OK   | scenario-orders-grpc-native | VU=10 | OI=1 | Run=1
+OK   | scenario-orders-rest | VU=100 | OI=1 | Run=1
+OK   | scenario-orders-grpc-envoy | VU=100 | OI=1 | Run=1
+OK   | scenario-orders-grpc-direct | VU=100 | OI=1 | Run=1
+OK   | scenario-orders-grpc-native | VU=100 | OI=1 | Run=1
+OK   | scenario-orders-rest | VU=500 | OI=1 | Run=1
+OK   | scenario-orders-grpc-envoy | VU=500 | OI=1 | Run=1
+OK   | scenario-orders-grpc-direct | VU=500 | OI=1 | Run=1
+OK   | scenario-orders-grpc-native | VU=500 | OI=1 | Run=1
+OK   | scenario-orders-rest | VU=10 | OI=10 | Run=1
+OK   | scenario-orders-grpc-envoy | VU=10 | OI=10 | Run=1
+OK   | scenario-orders-grpc-direct | VU=10 | OI=10 | Run=1
+OK   | scenario-orders-grpc-native | VU=10 | OI=10 | Run=1
+OK   | scenario-orders-rest | VU=100 | OI=10 | Run=1
+OK   | scenario-orders-grpc-envoy | VU=100 | OI=10 | Run=1
+OK   | scenario-orders-grpc-direct | VU=100 | OI=10 | Run=1
+OK   | scenario-orders-grpc-native | VU=100 | OI=10 | Run=1
+OK   | scenario-orders-rest | VU=500 | OI=10 | Run=1
+OK   | scenario-orders-grpc-envoy | VU=500 | OI=10 | Run=1
+OK   | scenario-orders-grpc-direct | VU=500 | OI=10 | Run=1
+OK   | scenario-orders-grpc-native | VU=500 | OI=10 | Run=1
+OK   | scenario-echo-rest | VU=10 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=10 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-direct | VU=10 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-native | VU=10 | COUNT=10 | Run=1
+OK   | scenario-echo-rest | VU=100 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=100 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-direct | VU=100 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-native | VU=100 | COUNT=10 | Run=1
+OK   | scenario-echo-rest | VU=500 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=500 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-direct | VU=500 | COUNT=10 | Run=1
+OK   | scenario-echo-grpc-native | VU=500 | COUNT=10 | Run=1
+OK   | scenario-echo-rest | VU=10 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=10 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-direct | VU=10 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-native | VU=10 | COUNT=100 | Run=1
+OK   | scenario-echo-rest | VU=100 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=100 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-direct | VU=100 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-native | VU=100 | COUNT=100 | Run=1
+OK   | scenario-echo-rest | VU=500 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=500 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-direct | VU=500 | COUNT=100 | Run=1
+OK   | scenario-echo-grpc-native | VU=500 | COUNT=100 | Run=1
+OK   | scenario-echo-rest | VU=10 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=10 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-direct | VU=10 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-native | VU=10 | COUNT=200 | Run=1
+OK   | scenario-echo-rest | VU=100 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=100 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-direct | VU=100 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-native | VU=100 | COUNT=200 | Run=1
+OK   | scenario-echo-rest | VU=500 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-envoy | VU=500 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-direct | VU=500 | COUNT=200 | Run=1
+OK   | scenario-echo-grpc-native | VU=500 | COUNT=200 | Run=1

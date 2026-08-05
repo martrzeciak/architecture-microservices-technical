@@ -1,0 +1,92 @@
+{
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "path": "::status OK",
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 85332,
+                    "fails": 0,
+                    "name": "status OK"
+                },
+                "has products": {
+                    "fails": 0,
+                    "name": "has products",
+                    "path": "::has products",
+                    "id": "bd20344dacb9319039907d7c96ed89b0",
+                    "passes": 85332
+                }
+            },
+        "name": ""
+    },
+    "metrics": {
+        "data_received": {
+            "rate": 8484581.927427376,
+            "count": 1018214584
+        },
+        "iteration_duration": {
+            "p(99)": 15.92376729,
+            "avg": 12.349751487542846,
+            "min": 11.098814,
+            "med": 12.098253499999998,
+            "max": 23.125622,
+            "p(90)": 13.538526000000001,
+            "p(95)": 14.26892745
+        },
+        "iterations": {
+            "count": 85332,
+            "rate": 711.0547780478784
+        },
+        "echo_grpc_errors": {
+            "passes": 0,
+            "fails": 85332,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "grpc_req_duration": {
+            "med": 0.954705,
+            "max": 12.342019,
+            "p(90)": 1.9487539000000027,
+            "p(95)": 2.70015055,
+            "p(99)": 4.341139460000005,
+            "avg": 1.2128064518937671,
+            "min": 0.583081,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "data_sent": {
+            "count": 6123216,
+            "rate": 51023.554983115566
+        },
+        "vus_max": {
+            "value": 10,
+            "min": 10,
+            "max": 10
+        },
+        "checks": {
+            "passes": 170664,
+            "fails": 0,
+            "value": 1
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 10
+        },
+        "echo_grpc_latency": {
+            "avg": 1.8879552805512587,
+            "min": 1,
+            "med": 2,
+            "max": 12,
+            "p(90)": 3,
+            "p(95)": 4,
+            "p(99)": 5
+        }
+    }
+}

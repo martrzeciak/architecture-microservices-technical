@@ -1,0 +1,82 @@
+{
+    "metrics": {
+        "grpc_streams_msgs_sent": {
+            "count": 507230,
+            "rate": 4226.70581286826
+        },
+        "grpc_streams_msgs_received": {
+            "rate": 33813.64650294608,
+            "count": 4057840
+        },
+        "data_received": {
+            "count": 330136318,
+            "rate": 2750998.746780602
+        },
+        "iteration_duration": {
+            "max": 102.501779,
+            "p(90)": 37.58093,
+            "p(95)": 43.296106599999995,
+            "avg": 20.69554530963082,
+            "min": 10.071372,
+            "med": 17.159834
+        },
+        "vus": {
+            "min": 1,
+            "max": 100,
+            "value": 1
+        },
+        "iterations": {
+            "count": 507230,
+            "rate": 4226.70581286826
+        },
+        "vus_max": {
+            "value": 100,
+            "min": 100,
+            "max": 100
+        },
+        "grpc_streams": {
+            "count": 507230,
+            "rate": 4226.70581286826
+        },
+        "grpc_stream_errors": {
+            "fails": 507230,
+            "passes": 0,
+            "value": 0
+        },
+        "data_sent": {
+            "count": 42782785,
+            "rate": 356505.42367405916
+        },
+        "grpc_req_duration": {
+            "avg": 15.05313932953279,
+            "min": 0.85601,
+            "med": 12.9509,
+            "max": 88.435643,
+            "p(90)": 29.09734020000001,
+            "p(95)": 35.4287486,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        },
+        "checks": {
+            "passes": 507230,
+            "fails": 0,
+            "value": 1
+        }
+    },
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "no stream error": {
+                    "name": "no stream error",
+                    "path": "::no stream error",
+                    "id": "03be78e5feaa5702d0334ad91a07ff82",
+                    "passes": 507230,
+                    "fails": 0
+                }
+            },
+        "name": "",
+        "path": ""
+    }
+}

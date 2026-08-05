@@ -1,0 +1,82 @@
+{
+    "metrics": {
+        "iteration_duration": {
+            "avg": 10.854246203481262,
+            "min": 10.079086,
+            "med": 10.770786,
+            "max": 32.768786,
+            "p(90)": 11.394919999999999,
+            "p(95)": 11.5878465
+        },
+        "data_sent": {
+            "count": 8187958,
+            "rate": 68231.10670326879
+        },
+        "data_received": {
+            "count": 63951087,
+            "rate": 532911.0678006684
+        },
+        "iterations": {
+            "count": 97090,
+            "rate": 809.0610808971378
+        },
+        "grpc_streams": {
+            "rate": 809.0610808971378,
+            "count": 97090
+        },
+        "grpc_streams_msgs_received": {
+            "count": 776720,
+            "rate": 6472.488647177102
+        },
+        "vus_max": {
+            "max": 10,
+            "value": 10,
+            "min": 10
+        },
+        "grpc_req_duration": {
+            "p(90)": 3.4451661,
+            "p(95)": 4.203342,
+            "avg": 2.5218857178597545,
+            "min": 0.926344,
+            "med": 2.3141445000000003,
+            "max": 30.669178,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        },
+        "vus": {
+            "max": 10,
+            "value": 1,
+            "min": 1
+        },
+        "checks": {
+            "passes": 97090,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_stream_errors": {
+            "passes": 0,
+            "fails": 97090,
+            "value": 0
+        },
+        "grpc_streams_msgs_sent": {
+            "count": 97090,
+            "rate": 809.0610808971378
+        }
+    },
+    "root_group": {
+        "groups": {},
+        "checks": {
+                "no stream error": {
+                    "passes": 97090,
+                    "fails": 0,
+                    "name": "no stream error",
+                    "path": "::no stream error",
+                    "id": "03be78e5feaa5702d0334ad91a07ff82"
+                }
+            },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+}
