@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateProductRequest, GetProductRequest, ListProductsRequest, ListProductsResponse, Product, StreamProductsRequest } from "./product_pb.js";
+import { CreateProductRequest, EchoProductsRequest, GetProductRequest, ListProductsRequest, ListProductsResponse, Product, StreamProductsRequest } from "./product_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -47,6 +47,17 @@ export declare const ProductService: {
       readonly I: typeof StreamProductsRequest,
       readonly O: typeof Product,
       readonly kind: MethodKind.ServerStreaming,
+    },
+    /**
+     * Echo endpoint: returns hardcoded products without DB/cache — isolates protocol overhead
+     *
+     * @generated from rpc product.ProductService.EchoProducts
+     */
+    readonly echoProducts: {
+      readonly name: "EchoProducts",
+      readonly I: typeof EchoProductsRequest,
+      readonly O: typeof ListProductsResponse,
+      readonly kind: MethodKind.Unary,
     },
   }
 };

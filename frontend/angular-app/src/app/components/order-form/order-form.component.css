@@ -1,0 +1,14 @@
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+.page-header h1 { margin-bottom: 1rem; }
+.protocol-switcher { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.protocol-label { font-weight: 600; }
+.protocol-btn { padding: 0.4rem 0.8rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: #f8f9fa; }
+.protocol-btn.active { background: #0366d6; color: white; border-color: #0366d6; }
+.protocol-info { font-size: 0.85rem; color: #666; margin-left: 0.5rem; }
+.order-info { background: #f8f9fa; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; }
+.order-info p { margin: 0.25rem 0; }
+.submit-btn { padding: 0.8rem 2rem; font-size: 1.1rem; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; }
+.submit-btn:disabled { background: #6c757d; cursor: not-allowed; }
+.submit-btn:hover:not(:disabled) { background: #218838; }
+.success { margin-top: 1rem; padding: 1rem; background: #d4edda; border-radius: 6px; }
+.error { margin-top: 1rem; padding: 1rem; background: #f8d7da; border-radius: 6px; }

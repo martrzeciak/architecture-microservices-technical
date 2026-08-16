@@ -37,15 +37,19 @@ export class ProtocolSwitcherService {
     this.activeProtocol.set(p);
   }
 
-  listProducts(): Observable<Product[]> {
+  /**
+   * @param pageSize liczba produktow na strone
+   * @param bypassCache pomija cache Redis (scenariusz zimnego cache)
+   */
+  listProducts(pageSize = 10, bypassCache = false): Observable<Product[]> {
     switch (this.activeProtocol()) {
       case 'rest':
-        return this.rest.listProducts() as unknown as Observable<Product[]>;
+        return this.rest.listProducts(pageSize, bypassCache) as unknown as Observable<Product[]>;
       case 'connect':
-        return this.connect.listProducts() as unknown as Observable<Product[]>;
+        return this.connect.listProducts(pageSize, bypassCache) as unknown as Observable<Product[]>;
       case 'grpc':
       default:
-        return this.grpc.listProducts() as unknown as Observable<Product[]>;
+        return this.grpc.listProducts(pageSize, bypassCache) as unknown as Observable<Product[]>;
     }
   }
 
@@ -58,6 +62,22 @@ export class ProtocolSwitcherService {
       case 'grpc':
       default:
         return this.grpc.getProduct(id) as unknown as Observable<Product>;
+    }
+  }
+
+  /**
+   * Endpoint echo — bez bazy i bez cache, izoluje narzut protokolu.
+   * @param count liczba zwracanych rekordow
+   */
+  echoProducts(count = 200): Observable<Product[]> {
+    switch (this.activeProtocol()) {
+      case 'rest':
+        return this.rest.echoProducts(count) as unknown as Observable<Product[]>;
+      case 'connect':
+        return this.connect.echoProducts(count) as unknown as Observable<Product[]>;
+      case 'grpc':
+      default:
+        return this.grpc.echoProducts(count) as unknown as Observable<Product[]>;
     }
   }
 }

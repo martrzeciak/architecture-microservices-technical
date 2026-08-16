@@ -1,0 +1,50 @@
+<div
+  class="container"
+  [attr.data-load-id]="loadId()"
+  [attr.data-load-status]="error() ? 'error' : 'ok'"
+>
+  <header class="page-header">
+    <h1>Echo — czysty narzut protokołu</h1>
+    <p class="subtitle">Dane wbudowane w kod usługi: bez bazy danych, bez cache.</p>
+  </header>
+
+  <!-- Przełącznik protokołu -->
+  <div class="protocol-switcher">
+    <span class="protocol-label">Protokół:</span>
+    @for (p of protocols; track p.value) {
+      <button
+        class="protocol-btn"
+        [class.active]="activeProtocol() === p.value"
+        (click)="setProtocol(p.value)"
+      >
+        {{ p.label }}
+      </button>
+    }
+    <span class="protocol-info">{{ protocolLabel() }}</span>
+  </div>
+
+  <!-- Parametry scenariusza (z URL: ?count=200) -->
+  <div class="scenario-params">
+    <span>Rozmiar odpowiedzi: <strong>{{ count() }}</strong> rekordów</span>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading">⏳ Ładowanie przez {{ protocolLabel() }}...</div>
+  }
+
+  @if (error()) {
+    <div class="error">
+      ❌ Błąd: {{ error() }}
+      <button (click)="load()">Ponów</button>
+    </div>
+  }
+
+  <!-- Podsumowanie zamiast tabeli: renderowanie wierszy kosztuje tyle samo dla
+       kazdego protokolu i rozcienczaloby mierzona roznice -->
+  @if (!isLoading() && received() > 0) {
+    <div class="stats">
+      <span>Odebrano: <strong>{{ received() }}</strong> rekordów</span>
+      <span>Suma cen: <strong>{{ totalPrice() | number: '1.2-2' }}</strong> zł</span>
+    </div>
+  }
+</div>

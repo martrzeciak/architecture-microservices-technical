@@ -77,3 +77,13 @@ export const StreamProductsRequest = /*@__PURE__*/ proto3.makeMessageType(
   ],
 );
 
+/**
+ * @generated from message product.EchoProductsRequest
+ */
+export const EchoProductsRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "product.EchoProductsRequest",
+  () => [
+    { no: 1, name: "count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+

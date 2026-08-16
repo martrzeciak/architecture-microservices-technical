@@ -210,3 +210,29 @@ export declare class StreamProductsRequest extends Message<StreamProductsRequest
   static equals(a: StreamProductsRequest | PlainMessage<StreamProductsRequest> | undefined, b: StreamProductsRequest | PlainMessage<StreamProductsRequest> | undefined): boolean;
 }
 
+/**
+ * @generated from message product.EchoProductsRequest
+ */
+export declare class EchoProductsRequest extends Message<EchoProductsRequest> {
+  /**
+   * number of hardcoded products to return (default 200)
+   *
+   * @generated from field: int32 count = 1;
+   */
+  count: number;
+
+  constructor(data?: PartialMessage<EchoProductsRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "product.EchoProductsRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EchoProductsRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EchoProductsRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EchoProductsRequest;
+
+  static equals(a: EchoProductsRequest | PlainMessage<EchoProductsRequest> | undefined, b: EchoProductsRequest | PlainMessage<EchoProductsRequest> | undefined): boolean;
+}
+

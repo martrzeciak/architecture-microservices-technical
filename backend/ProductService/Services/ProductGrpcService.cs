@@ -1,9 +1,9 @@
 using EShop.ProductService;
+using Google.Protobuf;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using ProductService.Data;
-using System.Text.Json;
 
 namespace ProductService.Services;
 
@@ -14,17 +14,30 @@ public class ProductGrpcService(ProductDbContext db, IDistributedCache cache) : 
         var pageSize = request.PageSize > 0 ? request.PageSize : 10;
         var page = request.Page > 0 ? request.Page : 1;
         bool bypassCache = context.RequestHeaders.Get("x-bypass-cache") != null;
-        string cacheKey = $"products_{request.CategoryId}_{page}_{pageSize}";
+        // Separate cache namespace per protocol: the REST endpoint stores JSON under
+        // its own key. The "pb" marker distinguishes this binary format from the JSON
+        // one used by earlier versions of this handler.
+        string cacheKey = $"grpcpb_products_{request.CategoryId}_{page}_{pageSize}";
 
         if (!bypassCache)
         {
-            var cached = await cache.GetStringAsync(cacheKey, context.CancellationToken);
-            if (!string.IsNullOrEmpty(cached))
+            // Cached as protobuf bytes rather than JSON. The previous version stored
+            // JSON, which forced a JSON deserialization plus a protobuf serialization
+            // on every cache hit, while the REST handler returned its cached JSON
+            // string verbatim. That asymmetry penalised gRPC in benchmarks for reasons
+            // unrelated to the protocols themselves.
+            var cached = await cache.GetAsync(cacheKey, context.CancellationToken);
+            if (cached is { Length: > 0 })
             {
-                var cachedResponse = JsonSerializer.Deserialize<CachedProductList>(cached)!;
-                var hit = new ListProductsResponse { TotalCount = cachedResponse.TotalCount };
-                hit.Products.AddRange(cachedResponse.Products);
-                return hit;
+                try
+                {
+                    return ListProductsResponse.Parser.ParseFrom(cached);
+                }
+                catch (InvalidProtocolBufferException)
+                {
+                    // Unreadable entry: fall through to the database instead of
+                    // failing the call with an empty response.
+                }
             }
         }
 
@@ -42,15 +55,13 @@ public class ProductGrpcService(ProductDbContext db, IDistributedCache cache) : 
         var response = new ListProductsResponse { TotalCount = totalCount };
         response.Products.AddRange(entities.Select(e => e.ToProto()));
 
-        await cache.SetStringAsync(cacheKey,
-            JsonSerializer.Serialize(new CachedProductList(response.Products, totalCount)),
+        await cache.SetAsync(cacheKey,
+            response.ToByteArray(),
             new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) },
             context.CancellationToken);
 
         return response;
     }
-
-    private record CachedProductList(IEnumerable<Product> Products, int TotalCount);
 
     public override async Task<Product> GetProduct(GetProductRequest request, ServerCallContext context)
     {

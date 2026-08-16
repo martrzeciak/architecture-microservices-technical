@@ -76,11 +76,16 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
-// run pending migrations on startup
+// run pending migrations on startup, then top the catalogue up to the target size
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
     db.Database.Migrate();
+
+    // Payload-size sweeps need more rows than the 500 seeded via migrations.
+    var targetProducts = builder.Configuration.GetValue("SEED_PRODUCT_COUNT", 2000);
+    ProductSeeder.EnsureProductCount(
+        db, targetProducts, scope.ServiceProvider.GetRequiredService<ILogger<Program>>());
 }
 
 app.UseCors();
@@ -102,7 +107,8 @@ app.MapPost("/admin/cache/flush", async (IConnectionMultiplexer redis) =>
 app.MapGet("/api/products", async (HttpContext context, ProductDbContext db, IDistributedCache cache, string? categoryId, int page = 1, int pageSize = 10) =>
 {
     bool bypassCache = context.Request.Headers.ContainsKey("X-Bypass-Cache");
-    string cacheKey = $"products_{categoryId}_{page}_{pageSize}";
+    // Separate cache namespace per protocol - the gRPC handler stores a different JSON shape.
+    string cacheKey = $"rest_products_{categoryId}_{page}_{pageSize}";
 
     if (!bypassCache)
     {

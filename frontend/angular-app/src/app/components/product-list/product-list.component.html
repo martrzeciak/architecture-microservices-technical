@@ -1,4 +1,8 @@
-<div class="container">
+<div
+  class="container"
+  [attr.data-load-id]="loadId()"
+  [attr.data-load-status]="error() ? 'error' : 'ok'"
+>
   <header class="page-header">
     <h1>Lista produktów</h1>
   </header>
@@ -18,6 +22,15 @@
     <span class="protocol-info">{{ protocolLabel() }}</span>
   </div>
 
+  <!-- Parametry scenariusza (z URL: ?pageSize=200&cold=1) -->
+  <div class="scenario-params">
+    <span>Rozmiar strony: <strong>{{ pageSize() }}</strong></span>
+    <span>
+      Cache:
+      <strong>{{ coldCache() ? 'zimny (pomijany)' : 'ciepły (Redis)' }}</strong>
+    </span>
+  </div>
+
   <!-- Stan ładowania -->
   @if (isLoading()) {
     <div class="loading">⏳ Ładowanie przez {{ protocolLabel() }}...</div>
@@ -31,11 +44,14 @@
     </div>
   }
 
-  <!-- Statystyki -->
+  <!-- Statystyki (liczone po wszystkich odebranych rekordach) -->
   @if (products().length > 0) {
     <div class="stats">
       <span>Produktów: <strong>{{ products().length }}</strong></span>
       <span>Łączna wartość: <strong>{{ totalPrice() | number:'1.2-2' }} PLN</strong></span>
+      @if (isTruncated()) {
+        <span>Wyświetlono pierwsze <strong>{{ renderLimit }}</strong></span>
+      }
     </div>
   }
 
@@ -53,7 +69,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (product of products(); track product.id) {
+        @for (product of visibleProducts(); track product.id) {
           <tr>
             <td>{{ product.id }}</td>
             <td><strong>{{ product.name }}</strong></td>

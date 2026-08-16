@@ -6,7 +6,7 @@ import { ProductService } from '../../generated-connect/product_connect.js';
 import type { Product } from '../../generated-connect/product_pb.js';
 
 const transport = createGrpcWebTransport({
-  baseUrl: 'http://localhost:5002', // Direct .NET — bez Envoy proxy
+  baseUrl: 'https://167.233.253.101:5002', // Direct .NET — bez Envoy proxy
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,14 +14,33 @@ const client: any = createClient(ProductService, transport);
 
 @Injectable({ providedIn: 'root' })
 export class ConnectProductService {
-  listProducts(): Observable<Product[]> {
+  /**
+   * @param pageSize liczba produktow na strone (parytet z PAGE_SIZE w testach k6)
+   * @param bypassCache pomija cache Redis po stronie serwera (scenariusz zimnego cache)
+   */
+  listProducts(pageSize = 10, bypassCache = false): Observable<Product[]> {
+    const options = bypassCache ? { headers: { 'x-bypass-cache': 'true' } } : undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const p: Promise<Product[]> = client.listProducts({}).then((r: any) => r.products as Product[]);
+    const p: Promise<Product[]> = client
+      .listProducts({ page: 1, pageSize }, options)
+      .then((r: any) => r.products as Product[]);
     return from(p);
   }
 
   getProduct(id: string): Observable<Product> {
     return from(client.getProduct({ id }) as Promise<Product>);
+  }
+
+  /**
+   * Endpoint echo: dane wbudowane w kod, bez bazy i bez cache.
+   * Izoluje czysty narzut protokolu (parytet ze scenariuszami echo w k6).
+   */
+  echoProducts(count = 200): Observable<Product[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p: Promise<Product[]> = client
+      .echoProducts({ count })
+      .then((r: any) => r.products as Product[]);
+    return from(p);
   }
 
   streamProducts(): Observable<Product> {

@@ -52,6 +52,20 @@ export const routes: Routes = [
             (m) => m.StreamingDemoComponent,
           ),
       },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./components/order-form/order-form.component').then(
+            (m) => m.OrderFormComponent,
+          ),
+      },
+      {
+        path: 'echo',
+        loadComponent: () =>
+          import('./components/echo/echo.component').then(
+            (m) => m.EchoComponent,
+          ),
+      },
     ],
   },
 ];
