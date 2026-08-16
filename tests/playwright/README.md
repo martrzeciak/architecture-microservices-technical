@@ -37,16 +37,29 @@ postęp i szacowany czas do końca.
 | `-EchoSizes` | `10,100,200,500,2000,5000` | `count` w scenariuszach echo |
 | `-PageSizes` | `10,100,200,500,1000,2000` | `PAGE_SIZE` |
 | `-CacheStates` | `warm,cold` | `BYPASS_CACHE` |
-| `-OrderItems` | `1,5,10` | `ORDER_ITEMS` |
+| `-OrderItems` | `1,10,50,200` | `ORDER_ITEMS` |
 | `-VUList` | `10,50` | `VU` |
+| `-LinkMbps` | 100 | pasmo łącza klienta w dół |
+| `-UplinkMbps` | 20 | pasmo łącza klienta w górę (scenariusz zapisu) |
 | `-Iter` | 20 | liczba żądań na VU w komórce |
 | `-Runs` | 5 | powtórzenia całej macierzy |
 | `-Cooldown` | 15 | sekund przerwy między przebiegami |
 
-Zmienna `MAX_VU_ROWS` (domyślnie 25 000) odfiltrowuje kombinacje, w których
-iloczyn VU × liczba rekordów na żądanie jest tak duży, że wąskim gardłem
-przestaje być protokół, a staje się baza (Products) albo procesor serwera (Echo).
-Pominięte komórki są wypisywane na starcie i zapisywane w `config.skipped_cells`.
+Dwa filtry odfiltrowują kombinacje, w których wąskim gardłem przestaje być
+protokół. `MAX_VU_ROWS` (domyślnie 25 000) dotyczy odczytu — iloczyn VU × liczba
+rekordów na żądanie; powyżej progu decyduje baza (Products) albo procesor serwera
+(Echo). `MAX_VU_ITEMS` (domyślnie 5 000) dotyczy zapisu i jest znacznie niższy,
+bo każda pozycja zamówienia to trwały wiersz w bazie: bez tego 200 pozycji przy
+50 VU wygenerowałoby ponad 3 mln wierszy w `OrderItems`, rozdymając tabelę
+w trakcie pomiaru. Pominięte komórki są wypisywane na starcie i zapisywane
+w `config.skipped_cells`.
+
+Tryb planowania — wypisuje macierz, liczbę próbek i liczbę zapisów, bez
+uruchamiania Angulara i bez dotykania backendu:
+
+```powershell
+.\run-browser-benchmark.ps1 -DryRun
+```
 
 Skrypt pokazuje bieżący postęp i ETA. Liczba komórek zależy od parametrów
 i filtra `MAX_VU_ROWS`; przy domyślnych wartościach jest to kilkadziesiąt komórek
@@ -70,7 +83,7 @@ Pusta lista wyłącza scenariusz — np. sam pomiar narzutu protokołu:
 | Rozmiar odpowiedzi echo | 10 / 100 / 200 / 500 / 2000 / 5000 | odtworzone i rozszerzone |
 | Rozmiar strony | 10 / 100 / 200 / 500 / 1000 / 2000 | odtworzone i rozszerzone |
 | Stan cache | ciepły / zimny (`X-Bypass-Cache`) | odtworzone |
-| Pozycje zamówienia | 1 / 5 / 10 | odtworzone |
+| Pozycje zamówienia | 1 / 10 / 50 / 200 | odtworzone i rozszerzone |
 | Protokoły | REST, gRPC-Web/Envoy, gRPC-Web/Direct | odtworzone |
 | Liczba użytkowników | 10 / 50 | częściowo — patrz niżej |
 | Natywne gRPC | — | **nieodtwarzalne w przeglądarce** |
@@ -141,36 +154,164 @@ limitowi czasu. W pomiarze kontrolnym **wszystkie** próbki gRPC-Web/Envoy wysz�
 ~3010 ms przy rzeczywistym czasie ~34 ms. Obecna metoda daje zmienność między
 przebiegami na poziomie CV < 4%.
 
+## Budżet pasma łącza klienta
+
+Zapotrzebowanie komórki na pasmo to VU × rozmiar ładunku ÷ długość cyklu. Przy
+stałym czasie namysłu 100 ms najcięższe komórki żądałyby około **230 Mbit/s** —
+więcej, niż ma typowe łącze domowe.
+
+Nasycenie łącza byłoby tu groźniejsze niż zwykły szum, bo opóźnienie rosłoby
+**proporcjonalnie do rozmiaru ładunku**. REST przesyła o ~43% więcej bajtów, więc
+ucierpiałby bardziej niż protobuf, a zmierzona „przewaga protokołu" byłaby
+częściowo odbiciem przepustowości łącza klienta — w kierunku **zawyżającym** wynik
+gRPC.
+
+Ponieważ mierzoną wielkością jest opóźnienie pojedynczego żądania, a nie
+przepustowość, rozwiązaniem nie jest usuwanie komórek, lecz **adaptacyjny czas
+namysłu**: skrypt wydłuża przerwę między żądaniami tak, aby zapotrzebowanie
+zmieściło się w połowie zadeklarowanego pasma. Każde żądanie mierzy się
+identycznie, tylko rzadziej. Przy domyślnych 100 Mbit/s czas namysłu waha się od
+100 ms do 724 ms, a szczytowe zapotrzebowanie żadnej komórki nie przekracza
+50 Mbit/s.
+
+Rozmiary ładunków wyznaczono pomiarem odpowiedzi na wdrożonym backendzie:
+133 B na rekord dla Products i 181 B dla Echo.
+
+> **Konsekwencja przy interpretacji:** `throughput_rps` nie jest porównywalny
+> **między komórkami**, bo mają różny czas namysłu. Porównywalny pozostaje między
+> protokołami w obrębie jednej komórki. Użyty czas namysłu jest zapisany w
+> `cells[].think_time_ms`. Opóźnienia (mediana, percentyle) są tym niezależne.
+
+Wartość nominalną łącza warto zastąpić zmierzoną — do pracy też lepiej wpisać
+pomiar niż deklarację operatora:
+
+```powershell
+.\measure-link.ps1                  # RTT + pobieranie (bez skutków ubocznych)
+.\measure-link.ps1 -IncludeUplink   # dodatkowo wysyłanie (tworzy 3 zamówienia)
+```
+
+Skrypt mierzy pojedynczy strumień oraz agregat z 4, 8 i 16 strumieni, bo jedno
+połączenie bywa ograniczone oknem TCP, a nie pojemnością łącza — dopiero
+równoległość pokazuje sufit. Na końcu wypisuje gotowe polecenie z zalecanymi
+wartościami (90% zmierzonego agregatu).
+
+Jeśli znasz swoje łącze, podaj je wprost: `-LinkMbps 300 -UplinkMbps 50`. Warto
+podać zwłaszcza realny upload, bo scenariusz Orders obciąża kierunek w górę,
+który na łączach asymetrycznych jest znacznie słabszy.
+
+## Zmierzona charakterystyka łącza
+
+Pomiar `measure-link.ps1` z komputera klienckiego do serwera w Norymberdze:
+
+Pomiar powtórzony trzykrotnie; rozrzut poniżej 5%.
+
+| Wielkość | Wartość |
+|---|---|
+| RTT (ICMP, 10 prób) | 24–30 ms, średnio **26,2–26,9 ms** |
+| Pobieranie, 1 strumień | **19,6–20,8 Mbit/s** |
+| Pobieranie, 4 strumienie | 74–79 Mbit/s |
+| Pobieranie, 8 strumieni | 143–146 Mbit/s |
+| Pobieranie, 16 strumieni | **269–273 Mbit/s** (bez osiągnięcia sufitu) |
+| Wysyłanie, 1 strumień | **19,2 Mbit/s** |
+
+Kluczowa obserwacja: pojedyncze połączenie jest ograniczone do ~20 Mbit/s, choć
+agregat skaluje się niemal liniowo. Iloczyn opóźnienia i przepustowości wynosi
+20 Mbit/s × 0,027 s = **67,5 KB**, co odpowiada oknu odbiorczemu TCP o rozmiarze
+64 KB: 65 536 B × 8 ÷ 0,027 s = 19,4 Mbit/s. Ograniczeniem pojedynczego żądania
+nie jest więc pojemność łącza, lecz rozmiar okna.
+
+Wysyłanie jednym połączeniem daje niemal identyczny wynik co pobieranie (19,2 vs
+20,8 Mbit/s), co potwierdza, że okno ogranicza symetrycznie oba kierunki — jest to
+niezależne potwierdzenie mechanizmu opisanego niżej.
+
+> Pomiar wysyłania wymagał obejścia. Pierwsza wersja wysyłała poprawne zamówienia
+> i dała bezużyteczne 0,7 Mbit/s: jedno zamówienie z 2000 pozycjami zajmowało
+> ~1,76 s, z czego niemal całość to zapis do bazy, saga i outbox, a nie transmisja
+> 154 KB. Obecna wersja wysyła celowo niedomknięty JSON — serwer musi wczytać całe
+> ciało żądania, żeby dojść do końca strumienia, i dopiero wtedy zwraca 400, więc
+> mierzymy transfer bez zapisu do bazy.
+
+Wartości pochodzące z pojedynczego strumienia (w tym wysyłanie) są **dolnym
+ograniczeniem** pojemności łącza, nie jej miarą — pokazuje to różnica 20 vs 273
+Mbit/s w pobieraniu. Dla wysyłania nie mierzono agregatu, dlatego zalecane
+`-UplinkMbps 17` jest zachowawcze.
+
+## Mechanizm przewagi protokołu
+
+Okno 64 KB wyjaśnia obserwowane różnice ilościowo. Transfer odpowiedzi wymaga
+`ceil(rozmiar / 64 KB)` okien, a każde okno kosztuje jedno RTT. Przewaga protobuf
+sprowadza się do liczby zaoszczędzonych okien:
+
+| Rekordów (echo) | REST: okien / zmierzone RTT | Direct: okien / zmierzone RTT |
+|---|---|---|
+| 500 | 1,38 / 1,0 | 0,92 / 0,1 |
+| 1000 | 2,76 / 2,1 | 1,85 / 1,2 |
+| 2000 | 5,52 / 5,2 | 3,69 / 3,2 |
+| 5000 | 13,80 / 14,3 | 9,23 / 9,1 |
+
+Zgodność jest bardzo dobra, zwłaszcza przy większych ładunkach. To także tłumaczy,
+dlaczego poniżej ~200 rekordów przewaga wynosiła zaledwie ~2 ms i nie zależała od
+rozmiaru: takie odpowiedzi mieszczą się w jednym oknie, więc liczba RTT jest
+identyczna, a pozostała różnica pochodzi z narzutu ramkowania i warstwy transportowej.
+
+Wniosek metodologiczny: **przewaga gRPC-Web rośnie z opóźnieniem sieci**, bo każde
+zaoszczędzone okno to jedno RTT mniej. W sieci lokalnej (RTT < 1 ms) niemal zanika,
+przez internet jest znacząca — co uzasadnia pomiar przez rzeczywiste łącze zamiast
+lokalnie.
+
+## Zacięcia sieciowe i polityka ich odrzucania
+
+W pomiarach pojawiają się sporadyczne próbki rzędu **2,6 s** przy medianie ~33 ms.
+Diagnostyka wskazuje, że nie są własnością protokołu:
+
+- występują **skupiskami** — w jednym teście 8 zacięć, w ośmiu pozostałych zero;
+- dotykają **wszystkich workerów jednocześnie** (8 zacięć wśród 10 workerów),
+  czyli jedno zdarzenie zamraża wszystkie żądania w locie;
+- **nie wypadają przy nawiązywaniu połączenia** — licznik `iter<=1` wynosił 0,
+  więc nie chodzi o koszt zestawienia TCP ani TLS;
+- trafiają ten protokół, który akurat jest mierzony, więc w kolejnych przebiegach
+  wypadają w różnych miejscach.
+
+Wskazuje to na przejściowe zdarzenia w sieci dostępowej klienta. Próbki powyżej
+**1000 ms** są więc odrzucane ze statystyk głównych, ale odrzucenie jest jawne
+i audytowalne:
+
+| Pole w wyniku | Zawartość |
+|---|---|
+| `stats` | mediana, percentyle, średnia — **bez zacięć** |
+| `stats.stats_all` | te same statystyki **ze wszystkimi** próbkami |
+| `stats.stall_count`, `stats.stall_rate_pct` | liczba i odsetek odrzuconych |
+| `stats.stall_threshold_ms` | użyty próg (1000 ms) |
+| `config.stall_policy` | próg, zakres stosowania i uzasadnienie |
+| `throughput_rps` | liczone ze **wszystkich** próbek — polityka go nie dotyczy |
+
+Dwie uwagi do interpretacji. Percentyle `p95` i `p99` po odrzuceniu opisują
+rozkład **warunkowo na brak zacięcia**, co należy zaznaczyć przy raportowaniu.
+Odsetek zacięć sam jest wynikiem obserwacyjnym — warto go podać, bo mówi coś
+o warunkach pomiaru.
+
 ## Trzy reżimy pomiarowe
 
-Różnica między protokołami nie skaluje się liniowo z rozmiarem odpowiedzi.
-Po odjęciu czasu bazowego i podzieleniu przez RTT (25,9 ms) nadwyżki okazują się
-całkowitymi wielokrotnościami RTT:
+Stąd trzy reżimy zachowania:
 
-| Rekordów (echo) | REST — nadwyżka | Direct — nadwyżka |
-|---|---|---|
-| 500 | +26,9 ms = 1,0 × RTT | +2,2 ms = 0 × RTT |
-| 1000 | +55,1 ms = 2,1 × RTT | +30,3 ms = 1,2 × RTT |
-| 2000 | +135,5 ms = 5,2 × RTT | +83,0 ms = 3,2 × RTT |
-| 5000 | +372,6 ms = 14,3 × RTT | +237,7 ms = 9,1 × RTT |
+- **do ~200 rekordów** (jedno okno) — dominuje RTT, ok. 84% pomiaru. Mierzony jest
+  stały narzut na żądanie: obsługa połączenia, ramkowanie, nagłówki, przeskok
+  w proxy. Efekt rzędu 2 ms (6%), wymaga ≥300 próbek na komórkę. To jedyny reżim,
+  w którym ścieżka przez Envoy przegrywa z REST.
+- **500–1000 rekordów** (2–3 okna) — reżim skokowy, różnica rośnie skokami o całe
+  RTT, w pomiarach do −45%.
+- **od 2000 rekordów** (wiele okien) — liczba okien jest proporcjonalna do bajtów,
+  więc różnica zbiega do stosunku rozmiarów (~33%). Wystarcza ~100 próbek.
 
-To nie efekt przepustowości: 54 KB różnicy przy ~200 Mbit/s to około 2 ms, nie 27.
-Mechanizm to okno przeciążenia TCP — większy ładunek JSON przekracza kolejne progi
-slow startu i wymaga dodatkowych podróży tam i z powrotem, mniejszy protobuf ich
-nie przekracza. Stąd trzy reżimy:
+### Ścieżka zapisu zachowuje się inaczej
 
-- **do ~200 rekordów** — dominuje RTT (ok. 84% pomiaru), mierzony jest stały
-  narzut na żądanie: obsługa połączenia, ramkowanie, nagłówki, przeskok w proxy.
-  Efekt rzędu 2 ms (6%), wymaga ≥300 próbek na komórkę. To jedyny reżim, w którym
-  ścieżka przez Envoy przegrywa z REST.
-- **500–1000 rekordów** — reżim skokowy, różnica rośnie skokami o całe RTT,
-  w pomiarach do −45%.
-- **od 2000 rekordów** — różnica proporcjonalna do bajtów, zbiega do stosunku
-  rozmiarów (~33%). Wystarcza ~100 próbek.
-
-Wniosek: przewaga gRPC-Web zależy głównie od **opóźnienia sieci**, nie od szybkości
-serwera. W sieci lokalnej niemal zanika, przez internet jest znacząca — co
-uzasadnia pomiar przez rzeczywiste łącze zamiast lokalnie.
+W scenariuszu Orders rozmiar ładunku **nie** jest dźwignią. W pomiarze kontrolnym
+(VU=3, n=30) przejście z 10 na 50 pozycji nie zmieniło niczego — wszystkie trzy
+protokoły siedziały na plateau 92–97 ms, mimo pięciokrotnie większego żądania.
+Dominuje stały koszt serwerowy: transakcja, wpis do outboxa, saga i commit, czyli
+około 60–70 ms ponad RTT. Wymiar liczby pozycji dokumentuje więc wpływ rozmiaru
+żądania na ścieżkę zapisu, ale nie izoluje narzutu protokołu — do tego służy
+scenariusz Echo, wolny od bazy i cache.
 
 ## Ograniczenia (do zaznaczenia w pracy)
 
@@ -190,9 +331,7 @@ uzasadnia pomiar przez rzeczywiste łącze zamiast lokalnie.
   idą po zwykłym HTTP (`:5000`, `:8080`), a ścieżka Direct po TLS (`:5002`), gdzie
   przeglądarka negocjuje HTTP/2 przez ALPN. Część przewagi ścieżki Direct może
   więc pochodzić z wersji protokołu HTTP, nie z samego formatu serializacji.
-- **Wartości średnie bywają skażone pojedynczymi zdarzeniami.** W pomiarach
-  kontrolnych zdarzały się pojedyncze zacięcia (`avg` 165 ms przy medianie 32 ms).
-  Do wnioskowania należy używać mediany i percentyli, nie średniej.
+- **Zacięcia sieciowe są odrzucane z agregacji** — patrz osobna sekcja niżej.
 - **Resztkowa asymetria cache.** `ProductGrpcService` trzyma w Redisie bajty
   protobuf, więc trafienie w cache to `ParseFrom` zamiast deserializacji JSON.
   Nadal nie jest to pełne zrównanie: REST zwraca gotowy string bez żadnej

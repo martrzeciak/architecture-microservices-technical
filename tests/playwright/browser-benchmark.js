@@ -33,7 +33,11 @@ const COOLDOWN_SEC = int(process.env.COOLDOWN, 15);
 // Baza zasiewowa ma 2000 rekordow (SEED_PRODUCT_COUNT).
 const PAGE_SIZES = list(process.env.PAGE_SIZES, '10,100,200,500,1000,2000').map(Number);
 const CACHE_STATES = list(process.env.CACHE_STATES, 'warm,cold');
-const ORDER_ITEMS = list(process.env.ORDER_ITEMS, '1,5,10').map(Number);
+// 50 i 200 wykracza poza macierz k6 (1/5/10) — rozszerza wymiar rozmiaru ladunku
+// takze na sciezke zapisu. Uwaga: w zapisie dominuje staly koszt serwerowy
+// (transakcja, outbox, saga), wiec ten wymiar dokumentuje wplyw rozmiaru zadania,
+// a nie izoluje narzutu protokolu — do tego sluzy scenariusz echo.
+const ORDER_ITEMS = list(process.env.ORDER_ITEMS, '1,10,50,200').map(Number);
 // 500-5000 wykracza poza macierz k6 (10/100/200) — dodane, bo przelom w roznicy
 // miedzy protokolami wypada powyzej 200 rekordow (patrz README).
 const ECHO_SIZES = list(process.env.ECHO_SIZES, '10,100,200,500,2000,5000').map(Number);
@@ -44,6 +48,55 @@ const VU_LIST = list(process.env.VU_LIST, '10,50').map(Number);
 // (Products) lub procesor serwera (Echo) — mierzylibysmy nasycenie, nie protokol.
 // Takie komorki sa pomijane i wypisane na wejsciu.
 const MAX_VU_ROWS = int(process.env.MAX_VU_ROWS, 25000);
+
+// Osobny, znacznie nizszy limit dla scenariusza zapisu: kazda pozycja zamowienia
+// to trwaly wiersz w bazie, a nie odczyt. Bez tego 200 pozycji przy 50 VU
+// wygenerowaloby miliony wierszy w OrderItems, co rozdymaloby tabele w trakcie
+// pomiaru i zaburzalo pozniejsze przebiegi.
+const MAX_VU_ITEMS = int(process.env.MAX_VU_ITEMS, 5000);
+
+// === BUDZET PASMA KLIENTA ===
+// Zapotrzebowanie komorki na pasmo to VU x rozmiar_ladunku / dlugosc_cyklu.
+// Przy 100 Mbit/s i czasie namyslu 100 ms najciezsze komorki zadalyby ~230 Mbit/s,
+// czyli lacze klienta stalo by sie waskim gardlem. Wtedy REST — wysylajacy o ~43%
+// wiecej bajtow — spuchlby bardziej niz protobuf, co ZAWYZYLOBY przewage gRPC:
+// mierzylibysmy przepustowosc lacza, nie protokol.
+//
+// Mierzona wielkoscia jest opoznienie pojedynczego zadania, nie przepustowosc,
+// dlatego zamiast usuwac komorki wydluzamy czas namyslu tak, aby zapotrzebowanie
+// zmiescilo sie w budzecie. Kazde zadanie mierzy sie identycznie, tylko rzadziej.
+const LINK_MBPS = int(process.env.LINK_MBPS, 100);      // pasmo w dol
+const UPLINK_MBPS = int(process.env.UPLINK_MBPS, 20);   // pasmo w gore (scenariusz zapisu)
+const LINK_BUDGET = 0.5;                                // wykorzystujemy najwyzej polowe
+const BASE_THINK_MS = 100;
+
+// Rozmiary wyznaczone pomiarem odpowiedzi REST na wdrozonym backendzie:
+// products 26 405 B / 200 rek. i 265 159 B / 2000 rek. -> 133 B/rekord
+// echo     36 242 B / 200 rek.                          -> 181 B/rekord
+const BYTES_PER_RECORD = { echo: 181, products: 133 };
+const BYTES_PER_ORDER_ITEM = 90;
+
+function thinkTimeMs(cell) {
+  let bytes;
+  let budgetBps;
+
+  if (cell.scenario === 'orders') {
+    // Scenariusz zapisu obciaza kierunek w gore, ktory na laczach asymetrycznych
+    // jest slabszy — dlatego osobny, nizszy budzet.
+    bytes = Math.max(1, cell.items) * BYTES_PER_ORDER_ITEM;
+    budgetBps = UPLINK_MBPS * 1e6 * LINK_BUDGET;
+  } else {
+    const rows = cell.scenario === 'echo' ? cell.echoSize : cell.pageSize;
+    bytes = rows * BYTES_PER_RECORD[cell.scenario];
+    budgetBps = LINK_MBPS * 1e6 * LINK_BUDGET;
+  }
+
+  // Cykl o dlugosci T daje agregat VU*bytes/T; wymagamy agregatu <= budzet.
+  // Pomijamy opoznienie w mianowniku, wiec wynik jest zachowawczy: rzeczywisty
+  // cykl (namysl + opoznienie) jest dluzszy, a wiec agregat jeszcze nizszy.
+  const requiredCycleMs = (cell.vu * bytes * 8 / budgetBps) * 1000;
+  return Math.max(BASE_THINK_MS, Math.round(requiredCycleMs));
+}
 
 const WARMUP_REQUESTS = 20; // na protokol, przed rozpoczeciem pomiarow
 const PRIME_REQUESTS = 3;   // na worker w kazdej komorce, nierejestrowane
@@ -101,6 +154,28 @@ function stats(times) {
   };
 }
 
+/**
+ * Rozdziela probki na wlasciwe i zaciecia.
+ *
+ * Zaciecia (~2,6 s przy medianie ~33 ms) sa skupione w czasie i dotykaja
+ * wszystkich workerow jednoczesnie, a diagnostyka wykazala, ze nie wypadaja
+ * przy nawiazywaniu polaczenia (iteracje 0-1). Wskazuje to na przejsciowe
+ * zdarzenia w sieci dostepowej klienta, niezalezne od protokolu — trafiaja ten,
+ * ktory akurat jest mierzony.
+ *
+ * Statystyki glowne liczone sa bez nich, ale odrzucenie jest jawne: liczba,
+ * odsetek i prog trafiaja do wyniku, a statystyki nieodfiltrowane sa zachowane
+ * w polu stats_all. Nic nie jest ukrywane.
+ */
+function splitStalls(times) {
+  const kept = [];
+  const stalls = [];
+  for (const t of times) {
+    if (t > STALL_THRESHOLD_MS) stalls.push(t); else kept.push(t);
+  }
+  return { kept, stalls };
+}
+
 function stdev(values) {
   if (values.length < 2) return null;
   const avg = values.reduce((a, b) => a + b, 0) / values.length;
@@ -155,6 +230,10 @@ function buildCells() {
 
   for (const vu of VU_LIST) {
     for (const items of ORDER_ITEMS) {
+      if (vu * items > MAX_VU_ITEMS) {
+        skipped.push(`ORDERS VU=${vu} items=${items}`);
+        continue;
+      }
       cells.push({
         scenario: 'orders',
         vu,
@@ -164,6 +243,10 @@ function buildCells() {
         label: `ORDERS   VU=${vu} items=${items}`,
       });
     }
+  }
+
+  for (const cell of cells) {
+    cell.thinkMs = thinkTimeMs(cell);
   }
 
   cells.skipped = skipped;
@@ -241,8 +324,16 @@ async function selectProtocol(page, protocolLabel) {
 }
 
 // === WORKER: JEDNA PRZEGLADARKA, JEDNA KOMORKA MACIERZY ===
+// Prog, powyzej ktorego probka jest traktowana jako zaciecie i raportowana
+// osobno. W pomiarach kontrolnych ~2,5% probek wychodzilo ~2,6 s przy medianie
+// ~33 ms, niezaleznie od protokolu. Diagnostyka notuje numer iteracji, zeby
+// ustalic, czy zaciecia wypadaja przy nawiazywaniu polaczenia (pierwsze iteracje)
+// czy losowo w trakcie.
+const STALL_THRESHOLD_MS = 1000;
+
 async function worker(browser, cell, protocol) {
   const times = [];
+  const stalls = [];
   let errors = 0;
   const isOrders = cell.scenario === 'orders';
   const measure = isOrders
@@ -278,13 +369,14 @@ async function worker(browser, cell, protocol) {
       const r = await measureInPage(page, measure);
       if (r.ok) {
         times.push(round(r.ms));
+        if (r.ms > STALL_THRESHOLD_MS) stalls.push({ iteration: i, ms: round(r.ms) });
       } else {
         errors++;
         if (errors === 1) {
           console.error(`      ! ${cell.label} ${protocol.label}: ${r.reason}`);
         }
       }
-      await sleep(100); // czas namyslu uzytkownika
+      await sleep(cell.thinkMs); // czas namyslu, dopasowany do budzetu pasma
     }
   } catch (err) {
     console.error(`      ! worker error (${cell.label} ${protocol.label}): ${err.message}`);
@@ -293,7 +385,7 @@ async function worker(browser, cell, protocol) {
     await context.close();
   }
 
-  return { times, errors };
+  return { times, errors, stalls };
 }
 
 // === TEST JEDNEJ KOMORKI DLA JEDNEGO PROTOKOLU ===
@@ -308,24 +400,37 @@ async function testCell(browser, cell, protocol) {
   const durationSec = (Date.now() - startAll) / 1000;
   const allTimes = results.flatMap(r => r.times);
   const errors = results.reduce((s, r) => s + r.errors, 0);
+  const allStalls = results.flatMap(r => r.stalls);
 
   if (allTimes.length === 0) {
     console.log(`      ${protocol.label.padEnd(18)} BRAK PROBEK (bledow: ${errors})`);
     return { stats: null, times: [], errors };
   }
 
-  const s = stats(allTimes);
+  // Statystyki glowne bez zaciec; wersja pelna zachowana w stats_all.
+  const { kept, stalls } = splitStalls(allTimes);
+  const s = kept.length > 0 ? stats(kept) : stats(allTimes);
+  s.stats_all = stats(allTimes);
+  s.stall_count = stalls.length;
+  s.stall_rate_pct = round((stalls.length / allTimes.length) * 100);
+  s.stall_threshold_ms = STALL_THRESHOLD_MS;
+  // Przepustowosc liczona ze WSZYSTKICH probek i rzeczywistego czasu trwania,
+  // wiec polityka odrzucania jej nie dotyczy.
   s.throughput_rps = round(allTimes.length / durationSec);
   s.total_duration_sec = round(durationSec);
   s.errors = errors;
 
+  const stallInfo = stalls.length > 0
+    ? `  zaciec=${stalls.length} (${s.stall_rate_pct}%, odrzucone)`
+    : '';
+
   console.log(
     `      ${protocol.label.padEnd(18)} n=${String(s.count).padStart(5)} err=${String(errors).padStart(3)}` +
     ` med=${String(s.med).padStart(7)}ms avg=${String(s.avg).padStart(7)}ms` +
-    ` p95=${String(s.p95).padStart(7)}ms  ${s.throughput_rps} ops/s`
+    ` p95=${String(s.p95).padStart(7)}ms  ${s.throughput_rps} ops/s${stallInfo}`
   );
 
-  return { stats: s, times: allTimes, errors };
+  return { stats: s, times: allTimes, errors, stalls: allStalls };
 }
 
 // === ROZGRZEWKA ===
@@ -395,12 +500,58 @@ async function main() {
   console.log(`Iteracje/VU:     ${ITERATIONS}   Przebiegi: ${RUNS}   Przerwa: ${COOLDOWN_SEC}s`);
   console.log(`Komorek macierzy:${cells.length}  ->  ${totalTests} wykonanych testow`);
   if (cells.skipped.length > 0) {
-    console.log(`Pominietych:     ${cells.skipped.length} (VU x rekordy > ${MAX_VU_ROWS})`);
+    console.log(`Pominietych:     ${cells.skipped.length}` +
+      ` (odczyt: VU x rekordy > ${MAX_VU_ROWS}, zapis: VU x pozycje > ${MAX_VU_ITEMS})`);
     for (const s of cells.skipped) console.log(`                 - ${s}`);
   }
+  console.log(`Budzet pasma:    ${LINK_MBPS} Mbit/s w dol, ${UPLINK_MBPS} Mbit/s w gore` +
+    ` (wykorzystanie do ${LINK_BUDGET * 100}%)`);
   console.log('Kolejnosc protokolow: rotacja (kwadrat lacinski)');
   console.log('='.repeat(78));
   console.log();
+
+  // Tryb planowania: wypisz macierz i szacunki, nic nie mierz.
+  if (process.env.DRY_RUN === '1') {
+    let samples = 0;
+    let requests = 0;
+    let estSec = 0;
+    console.log('KOMORKI (szczytowe pasmo liczone zachowawczo, bez opoznienia w cyklu):');
+    for (const cell of cells) {
+      const perTest = cell.vu * ITERATIONS;
+      samples += perTest * PROTOCOLS.length * RUNS;
+      requests += (cell.vu * (ITERATIONS + PRIME_REQUESTS)) * PROTOCOLS.length * RUNS;
+
+      const rows = cell.scenario === 'echo' ? cell.echoSize
+                 : cell.scenario === 'products' ? cell.pageSize
+                 : Math.max(1, cell.items);
+      const bytes = cell.scenario === 'orders'
+        ? rows * BYTES_PER_ORDER_ITEM
+        : rows * BYTES_PER_RECORD[cell.scenario];
+      const mbps = (cell.vu * bytes * 8) / (cell.thinkMs / 1000) / 1e6;
+
+      // Zachowawczo: cykl = namysl + ~50 ms narzutu, plus ~4 s na start kontekstow
+      const testSec = (ITERATIONS + PRIME_REQUESTS) * (cell.thinkMs + 50) / 1000 + 4;
+      estSec += testSec * PROTOCOLS.length * RUNS;
+
+      console.log(`   ${cell.label.padEnd(30)} ${String(perTest).padStart(5)} probek` +
+        `  namysl ${String(cell.thinkMs).padStart(5)} ms` +
+        `  szczyt ${mbps.toFixed(0).padStart(3)} Mbit/s`);
+    }
+    const warmupReqs = WARMUP_REQUESTS * PROTOCOLS.length * 3;
+    console.log();
+    console.log(`Komorek:            ${cells.length}`);
+    console.log(`Testow:             ${totalTests}`);
+    console.log(`Probek zmierzonych: ${samples.toLocaleString('pl-PL')}`);
+    console.log(`Zadan lacznie:      ${(requests + warmupReqs).toLocaleString('pl-PL')} (z rozgrzewka i zapytaniami przygotowawczymi)`);
+
+    const orderCells = cells.filter(c => c.scenario === 'orders');
+    const orderWrites = orderCells.reduce(
+      (s, c) => s + c.vu * (ITERATIONS + PRIME_REQUESTS) * PROTOCOLS.length * RUNS, 0);
+    console.log(`Zamowien do zapisu: ${orderWrites.toLocaleString('pl-PL')} (rosnaca tabela — patrz README)`);
+    console.log(`Szacowany czas:     ~${(estSec / 3600).toFixed(1)} h` +
+      ` (bez przerw miedzy przebiegami: ${((RUNS - 1) * COOLDOWN_SEC / 60).toFixed(0)} min)`);
+    return;
+  }
 
   if (cells.length === 0) {
     console.error('Brak komorek do zmierzenia — wszystkie listy puste lub odfiltrowane');
@@ -470,15 +621,29 @@ async function main() {
       echo_sizes: ECHO_SIZES,
       vu_list: VU_LIST,
       max_vu_rows: MAX_VU_ROWS,
+      max_vu_items: MAX_VU_ITEMS,
       skipped_cells: cells.skipped,
       iterations_per_vu: ITERATIONS,
       runs: RUNS,
       cooldown_sec: COOLDOWN_SEC,
       warmup_requests_per_protocol: WARMUP_REQUESTS,
       prime_requests_per_worker: PRIME_REQUESTS,
-      think_time_ms: 100,
+      think_time_ms: 'adaptacyjny — per komorka, patrz cells[].think_time_ms',
+      link_mbps: LINK_MBPS,
+      uplink_mbps: UPLINK_MBPS,
+      link_budget: LINK_BUDGET,
       rotation: 'latin_square',
       measurement: 'click -> DOM updated (in-page performance.now)',
+      stall_policy: {
+        threshold_ms: STALL_THRESHOLD_MS,
+        excluded_from: 'stats (mediana, percentyle, srednia)',
+        retained_in: 'stats_all oraz stall_count / stall_rate_pct',
+        applies_to_throughput: false,
+        rationale: 'Zaciecia ~2,6 s sa skupione w czasie, dotykaja wszystkich '
+          + 'workerow jednoczesnie i nie wypadaja przy nawiazywaniu polaczenia, '
+          + 'co wskazuje na przejsciowe zdarzenia w sieci dostepowej klienta, '
+          + 'niezalezne od protokolu.',
+      },
       not_reproducible_in_browser: ['grpc_native', 'grpc_native_streaming'],
     },
     cells: {},
@@ -495,6 +660,10 @@ async function main() {
     const cellOut = {
       scenario: cell.scenario,
       vu: cell.vu,
+      // Czas namyslu rozni sie miedzy komorkami (budzet pasma), dlatego
+      // throughput_rps NIE jest porownywalny miedzy komorkami — tylko miedzy
+      // protokolami w obrebie jednej komorki.
+      think_time_ms: cell.thinkMs,
       protocols: {},
     };
     if (cell.scenario === 'products') {
@@ -518,7 +687,15 @@ async function main() {
         continue;
       }
 
-      const s = stats(slot.allTimes);
+      // Ta sama polityka co w pojedynczym tescie: statystyki glowne bez zaciec,
+      // pelne zachowane w stats_all, liczba odrzuconych jawnie raportowana.
+      const split = splitStalls(slot.allTimes);
+      const s = split.kept.length > 0 ? stats(split.kept) : stats(slot.allTimes);
+      s.stats_all = stats(slot.allTimes);
+      s.stall_count = split.stalls.length;
+      s.stall_rate_pct = round((split.stalls.length / slot.allTimes.length) * 100);
+      s.stall_threshold_ms = STALL_THRESHOLD_MS;
+
       const medians = slot.runs.map(r => r.med);
       const sdInfo = stdev(medians);
       const interRun = sdInfo
@@ -538,7 +715,8 @@ async function main() {
         `   ${proto.label.padEnd(18)} n=${String(s.count).padStart(5)} err=${String(slot.errors).padStart(3)}` +
         ` med=${String(s.med).padStart(7)}ms avg=${String(s.avg).padStart(7)}ms` +
         ` p95=${String(s.p95).padStart(7)}ms` +
-        (interRun.cv !== null ? `  CV=${interRun.cv}%` : '')
+        (interRun.cv !== null ? `  CV=${interRun.cv}%` : '') +
+        (s.stall_count > 0 ? `  zaciec=${s.stall_count} (${s.stall_rate_pct}%)` : '')
       );
     }
 

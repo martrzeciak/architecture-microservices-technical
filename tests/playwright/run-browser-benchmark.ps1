@@ -11,13 +11,17 @@ param(
     [string]$VUList = "10,50",
     [string]$PageSizes = "10,100,200,500,1000,2000",
     [string]$CacheStates = "warm,cold",
-    [string]$OrderItems = "1,5,10",
+    [string]$OrderItems = "1,10,50,200",
     [string]$EchoSizes = "10,100,200,500,2000,5000",
+    [int]$LinkMbps = 100,
+    [int]$UplinkMbps = 20,
     [int]$Iter = 20,
     [int]$Runs = 5,
     [int]$Cooldown = 15,
     [switch]$Quick,
-    [switch]$SkipPreflight
+    [switch]$SkipPreflight,
+    [switch]$DryRun,
+    [switch]$TransportCheck
 )
 
 $ErrorActionPreference = "Stop"
@@ -60,6 +64,24 @@ Write-Host " Target:      $BACKEND_HOST (Hetzner, Norymberga)" -ForegroundColor 
 if ($Quick) { Write-Host " MODE: QUICK SMOKE TEST" -ForegroundColor Magenta }
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
+
+if ($DryRun) {
+    # Tryb planowania: nie startuje Angulara, nie dotyka backendu.
+    $env:VU_LIST = $VUList
+    $env:PAGE_SIZES = $PageSizes
+    $env:CACHE_STATES = $CacheStates
+    $env:ORDER_ITEMS = $OrderItems
+    $env:ECHO_SIZES = $EchoSizes
+    $env:LINK_MBPS = $LinkMbps
+    $env:UPLINK_MBPS = $UplinkMbps
+    $env:ITER = $Iter
+    $env:RUNS = $Runs
+    $env:COOLDOWN = $Cooldown
+    $env:DRY_RUN = "1"
+    Push-Location $PLAYWRIGHT_DIR
+    try { & node browser-benchmark.js } finally { Pop-Location; $env:DRY_RUN = $null }
+    exit 0
+}
 
 $angularProc = $null
 
@@ -176,13 +198,16 @@ try {
     $env:CACHE_STATES = $CacheStates
     $env:ORDER_ITEMS = $OrderItems
     $env:ECHO_SIZES = $EchoSizes
+    $env:LINK_MBPS = $LinkMbps
+    $env:UPLINK_MBPS = $UplinkMbps
     $env:ITER = $Iter
     $env:RUNS = $Runs
     $env:COOLDOWN = $Cooldown
 
+    $script = if ($TransportCheck) { "check-transport.js" } else { "browser-benchmark.js" }
     Push-Location $PLAYWRIGHT_DIR
     try {
-        & node browser-benchmark.js
+        & node $script
         $exitCode = $LASTEXITCODE
     } finally { Pop-Location }
 
