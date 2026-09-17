@@ -1,0 +1,92 @@
+{
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "fails": 0,
+                    "name": "status OK",
+                    "path": "::status OK",
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 553783
+                },
+                "has products": {
+                    "name": "has products",
+                    "path": "::has products",
+                    "id": "bd20344dacb9319039907d7c96ed89b0",
+                    "passes": 553783,
+                    "fails": 0
+                }
+            }
+    },
+    "metrics": {
+        "vus": {
+            "value": 19,
+            "min": 16,
+            "max": 500
+        },
+        "data_received": {
+            "count": 434152059,
+            "rate": 3617678.8615454016
+        },
+        "checks": {
+            "passes": 1107566,
+            "fails": 0,
+            "value": 1
+        },
+        "iterations": {
+            "count": 553783,
+            "rate": 4614.533114498478
+        },
+        "vus_max": {
+            "value": 500,
+            "min": 500,
+            "max": 500
+        },
+        "grpc_req_duration": {
+            "max": 301.266726,
+            "p(90)": 152.9176526,
+            "p(95)": 179.1331941,
+            "p(99)": 211.5257517800001,
+            "avg": 82.32859721786532,
+            "min": 0.59327,
+            "med": 74.389957,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "grpc_native_products_errors": {
+            "passes": 0,
+            "fails": 553783,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "data_sent": {
+            "rate": 337959.79824580235,
+            "count": 40558034
+        },
+        "grpc_native_products_latency": {
+            "avg": 82.68967989266554,
+            "min": 0,
+            "med": 75,
+            "max": 301,
+            "p(90)": 153,
+            "p(95)": 180,
+            "p(99)": 212
+        },
+        "iteration_duration": {
+            "p(99)": 225.75521564000022,
+            "avg": 94.7499650207213,
+            "min": 10.797358,
+            "med": 86.091539,
+            "max": 357.053007,
+            "p(90)": 167.88788019999998,
+            "p(95)": 193.62791220000003
+        }
+    }
+}

@@ -1,0 +1,92 @@
+{
+    "root_group": {
+        "checks": {
+            "status OK": {
+                "name": "status OK",
+                "path": "::status OK",
+                "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                "passes": 69592,
+                "fails": 0
+            },
+            "has products": {
+                "name": "has products",
+                "path": "::has products",
+                "id": "bd20344dacb9319039907d7c96ed89b0",
+                "passes": 69592,
+                "fails": 0
+            }
+        },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {}
+    },
+    "metrics": {
+        "echo_grpc_latency": {
+            "p(95)": 9,
+            "p(99)": 11,
+            "avg": 4.167131279457409,
+            "min": 1,
+            "med": 3,
+            "max": 22,
+            "p(90)": 7
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 10
+        },
+        "vus_max": {
+            "value": 10,
+            "min": 10,
+            "max": 10
+        },
+        "grpc_req_duration": {
+            "avg": 2.6960535320726415,
+            "min": 0.803243,
+            "med": 1.8599305,
+            "max": 20.72688,
+            "p(90)": 5.5508321,
+            "p(95)": 6.934137799999994,
+            "p(99)": 9.741108469999995,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "iteration_duration": {
+            "p(90)": 18.388896,
+            "p(95)": 19.795020799999996,
+            "p(99)": 22.827053379999978,
+            "avg": 15.137039214378028,
+            "min": 11.818172,
+            "med": 14.5812275,
+            "max": 34.711236
+        },
+        "iterations": {
+            "rate": 579.914836930279,
+            "count": 69592
+        },
+        "echo_grpc_errors": {
+            "passes": 0,
+            "fails": 69592,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "data_sent": {
+            "count": 5965739,
+            "rate": 49712.906071870406
+        },
+        "checks": {
+            "passes": 139184,
+            "fails": 0,
+            "value": 1
+        },
+        "data_received": {
+            "count": 1680123374,
+            "rate": 14000581.567650879
+        }
+    }
+}

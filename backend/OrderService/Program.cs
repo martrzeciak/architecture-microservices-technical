@@ -7,7 +7,6 @@ using OrderService.Data;
 using OrderService.Events;
 using OrderService.Saga;
 using OrderService.Services;
-using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,0 +1,92 @@
+{
+    "metrics": {
+        "data_sent": {
+            "count": 12078253,
+            "rate": 100643.36005603203
+        },
+        "checks": {
+            "passes": 328560,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_native_products_errors": {
+            "passes": 0,
+            "fails": 164280,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "grpc_req_duration": {
+            "max": 770.528487,
+            "p(90)": 430.47965949999997,
+            "p(95)": 455.23767309999994,
+            "p(99)": 508.46544244999933,
+            "avg": 296.6004537187513,
+            "min": 0.917729,
+            "med": 319.20655,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "data_received": {
+            "rate": 10270704.48399084,
+            "count": 1232591670
+        },
+        "grpc_native_products_latency": {
+            "max": 809,
+            "p(90)": 433,
+            "p(95)": 459,
+            "p(99)": 517,
+            "avg": 299.3821585098612,
+            "min": 1,
+            "med": 322
+        },
+        "vus": {
+            "value": 22,
+            "min": 15,
+            "max": 500
+        },
+        "iteration_duration": {
+            "max": 1150.724191,
+            "p(90)": 451.38131020000003,
+            "p(95)": 478.8391640499999,
+            "p(99)": 548.51763523,
+            "avg": 318.9950465601383,
+            "min": 11.555902,
+            "med": 345.0600875
+        },
+        "iterations": {
+            "count": 164280,
+            "rate": 1368.8810120143155
+        },
+        "vus_max": {
+            "value": 500,
+            "min": 500,
+            "max": 500
+        }
+    },
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 164280,
+                    "fails": 0,
+                    "name": "status OK",
+                    "path": "::status OK"
+                },
+                "has products": {
+                    "name": "has products",
+                    "path": "::has products",
+                    "id": "bd20344dacb9319039907d7c96ed89b0",
+                    "passes": 164280,
+                    "fails": 0
+                }
+            },
+        "name": ""
+    }
+}

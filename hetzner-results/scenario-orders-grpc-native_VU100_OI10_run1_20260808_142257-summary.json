@@ -1,0 +1,92 @@
+{
+    "root_group": {
+        "checks": {
+            "status OK": {
+                "name": "status OK",
+                "path": "::status OK",
+                "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                "passes": 152693,
+                "fails": 0
+            },
+            "has order id": {
+                "name": "has order id",
+                "path": "::has order id",
+                "id": "eaf29dffb3e9ddff3a846729d213593c",
+                "passes": 152693,
+                "fails": 0
+            }
+        },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {}
+    },
+    "metrics": {
+        "grpc_req_duration": {
+            "med": 56.763308,
+            "max": 647.936224,
+            "p(90)": 89.61039420000002,
+            "p(95)": 100.0335922,
+            "p(99)": 131.5798427599998,
+            "avg": 56.61861140453117,
+            "min": 3.763461,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "grpc_native_orders_errors": {
+            "passes": 0,
+            "fails": 152693,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "data_received": {
+            "count": 70395902,
+            "rate": 586568.856436663
+        },
+        "iterations": {
+            "count": 152693,
+            "rate": 1272.303583749568
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 100
+        },
+        "iteration_duration": {
+            "p(95)": 114.07273939999999,
+            "p(99)": 144.76865719999967,
+            "avg": 68.7941970065311,
+            "min": 14.165716,
+            "med": 68.83317,
+            "max": 663.837677,
+            "p(90)": 102.99489260000004
+        },
+        "vus_max": {
+            "min": 100,
+            "max": 100,
+            "value": 100
+        },
+        "checks": {
+            "passes": 305386,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_native_orders_latency": {
+            "avg": 56.90780192936153,
+            "min": 4,
+            "med": 57,
+            "max": 648,
+            "p(90)": 90,
+            "p(95)": 100,
+            "p(99)": 132
+        },
+        "data_sent": {
+            "rate": 505376.71820724616,
+            "count": 60651788
+        }
+    }
+}

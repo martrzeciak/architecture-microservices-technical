@@ -327,10 +327,11 @@ scenariusz Echo, wolny od bazy i cache.
   maszynie; przy 50 VU część opóźnienia może pochodzić z klienta.
 - **Certyfikat self-signed** na ścieżce Direct wymaga `ignoreHTTPSErrors`; narzut
   nawiązania TLS jest widoczny w ogonie rozkładu (p95).
-- **Różna warstwa transportowa między protokołami.** REST i ścieżka przez Envoy
-  idą po zwykłym HTTP (`:5000`, `:8080`), a ścieżka Direct po TLS (`:5002`), gdzie
-  przeglądarka negocjuje HTTP/2 przez ALPN. Część przewagi ścieżki Direct może
-  więc pochodzić z wersji protokołu HTTP, nie z samego formatu serializacji.
+- **Ścieżka Direct używa HTTP/2, pozostałe HTTP/1.1** (zmierzone, patrz sekcja
+  o dekompozycji efektu). Nie jest to wada porównania: gRPC wymaga HTTP/2 ze
+  specyfikacji, więc jest to nieodłączna cecha protokołu, a nie przywilej
+  przyznany w eksperymencie. Wpływ obu czynników daje się rozdzielić dzięki
+  ścieżce przez Envoy — patrz niżej.
 - **Zacięcia sieciowe są odrzucane z agregacji** — patrz osobna sekcja niżej.
 - **Resztkowa asymetria cache.** `ProductGrpcService` trzyma w Redisie bajty
   protobuf, więc trafienie w cache to `ParseFrom` zamiast deserializacji JSON.

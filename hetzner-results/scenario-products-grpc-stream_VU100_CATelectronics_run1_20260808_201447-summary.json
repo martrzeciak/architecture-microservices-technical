@@ -1,0 +1,82 @@
+{
+    "root_group": {
+        "groups": {},
+        "checks": {
+                "no stream error": {
+                    "id": "03be78e5feaa5702d0334ad91a07ff82",
+                    "passes": 466192,
+                    "fails": 0,
+                    "name": "no stream error",
+                    "path": "::no stream error"
+                }
+            },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "metrics": {
+        "grpc_streams_msgs_received": {
+            "count": 3729536,
+            "rate": 31078.844556773347
+        },
+        "data_received": {
+            "count": 303538939,
+            "rate": 2529440.5261429055
+        },
+        "grpc_req_duration": {
+            "avg": 16.48203934883037,
+            "min": 0.898601,
+            "med": 14.197323,
+            "max": 78.937697,
+            "p(90)": 31.5138331,
+            "p(95)": 38.73287799999998,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        },
+        "grpc_stream_errors": {
+            "passes": 0,
+            "fails": 466192,
+            "value": 0
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 100
+        },
+        "grpc_streams": {
+            "count": 466192,
+            "rate": 3884.8555695966684
+        },
+        "checks": {
+            "passes": 466192,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_streams_msgs_sent": {
+            "count": 466192,
+            "rate": 3884.8555695966684
+        },
+        "iteration_duration": {
+            "avg": 22.518134982365076,
+            "min": 10.070902,
+            "med": 18.916323,
+            "max": 84.364764,
+            "p(90)": 41.00225470000001,
+            "p(95)": 47.76130189999998
+        },
+        "iterations": {
+            "count": 466192,
+            "rate": 3884.8555695966684
+        },
+        "data_sent": {
+            "count": 39310698,
+            "rate": 327582.59273010393
+        },
+        "vus_max": {
+            "value": 100,
+            "min": 100,
+            "max": 100
+        }
+    }
+}

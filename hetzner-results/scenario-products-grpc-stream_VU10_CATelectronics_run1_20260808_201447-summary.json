@@ -1,0 +1,82 @@
+{
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "no stream error": {
+                    "fails": 0,
+                    "name": "no stream error",
+                    "path": "::no stream error",
+                    "id": "03be78e5feaa5702d0334ad91a07ff82",
+                    "passes": 97046
+                }
+            },
+        "name": ""
+    },
+    "metrics": {
+        "data_received": {
+            "rate": 532255.0033261952,
+            "count": 63876293
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 10
+        },
+        "grpc_stream_errors": {
+            "passes": 0,
+            "fails": 97046,
+            "value": 0
+        },
+        "grpc_streams_msgs_sent": {
+            "count": 97046,
+            "rate": 808.6445945257647
+        },
+        "iterations": {
+            "count": 97046,
+            "rate": 808.6445945257647
+        },
+        "checks": {
+            "passes": 97046,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_streams_msgs_received": {
+            "count": 776368,
+            "rate": 6469.156756206117
+        },
+        "iteration_duration": {
+            "avg": 10.859335737557423,
+            "min": 10.07968,
+            "med": 10.7483975,
+            "max": 32.278077,
+            "p(90)": 11.4063125,
+            "p(95)": 11.622402999999998
+        },
+        "vus_max": {
+            "value": 10,
+            "min": 10,
+            "max": 10
+        },
+        "grpc_streams": {
+            "count": 97046,
+            "rate": 808.6445945257647
+        },
+        "data_sent": {
+            "count": 8184671,
+            "rate": 68199.51324239829
+        },
+        "grpc_req_duration": {
+            "p(90)": 3.3635669999999998,
+            "p(95)": 4.1489265,
+            "avg": 2.4988763354903916,
+            "min": 0.996104,
+            "med": 2.259715,
+            "max": 31.941227,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        }
+    }
+}

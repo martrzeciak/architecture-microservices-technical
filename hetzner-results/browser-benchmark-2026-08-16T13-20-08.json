@@ -1,0 +1,2799 @@
+{
+  "test": "browser-benchmark",
+  "timestamp": "2026-08-16T13-20-08",
+  "config": {
+    "frontend_url": "http://localhost:4200",
+    "page_sizes": [
+      10,
+      500,
+      2000
+    ],
+    "cache_states": [
+      "warm",
+      "cold"
+    ],
+    "order_items": [
+      1,
+      50
+    ],
+    "echo_sizes": [
+      200,
+      2000
+    ],
+    "vu_list": [
+      10,
+      20
+    ],
+    "max_vu_rows": 25000,
+    "max_vu_items": 5000,
+    "skipped_cells": [
+      "ECHO VU=20 n=2000",
+      "PRODUCTS VU=20 PS=2000 cache=warm",
+      "PRODUCTS VU=20 PS=2000 cache=cold"
+    ],
+    "iterations_per_vu": 20,
+    "runs": 2,
+    "cooldown_sec": 10,
+    "warmup_requests_per_protocol": 20,
+    "prime_requests_per_worker": 3,
+    "think_time_ms": "adaptacyjny — per komorka, patrz cells[].think_time_ms",
+    "link_mbps": 245,
+    "uplink_mbps": 17,
+    "link_budget": 0.5,
+    "rotation": "latin_square",
+    "measurement": "click -> DOM updated (in-page performance.now)",
+    "not_reproducible_in_browser": [
+      "grpc_native",
+      "grpc_native_streaming"
+    ]
+  },
+  "cells": {
+    "echo_VU10_N200": {
+      "scenario": "echo",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 28.2,
+            "avg": 100.2,
+            "med": 33.6,
+            "p90": 38.4,
+            "p95": 40.4,
+            "p99": 2700.4,
+            "max": 2789.8
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 28.2,
+              "avg": 33.9,
+              "med": 33.9,
+              "p90": 36.9,
+              "p95": 38.2,
+              "p99": 41,
+              "max": 43.1,
+              "throughput_rps": 41.7,
+              "total_duration_sec": 4.8,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 28.4,
+              "avg": 166.4,
+              "med": 33.2,
+              "p90": 40.1,
+              "p95": 2635.6,
+              "p99": 2730.1,
+              "max": 2789.8,
+              "throughput_rps": 26.5,
+              "total_duration_sec": 7.5,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              33.9,
+              33.2
+            ],
+            "sd": 0.5,
+            "cv": 1.5
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 28.5,
+            "avg": 35,
+            "med": 34.3,
+            "p90": 39.9,
+            "p95": 41.1,
+            "p99": 44.5,
+            "max": 45.1
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 29.8,
+              "avg": 36.3,
+              "med": 36.2,
+              "p90": 41,
+              "p95": 42.4,
+              "p99": 44.9,
+              "max": 45.1,
+              "throughput_rps": 41.2,
+              "total_duration_sec": 4.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 28.5,
+              "avg": 33.6,
+              "med": 33.4,
+              "p90": 36.7,
+              "p95": 39.1,
+              "p99": 41.2,
+              "max": 41.2,
+              "throughput_rps": 43.5,
+              "total_duration_sec": 4.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              36.2,
+              33.4
+            ],
+            "sd": 2,
+            "cv": 5.7
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 27.4,
+            "avg": 31.6,
+            "med": 31.5,
+            "p90": 34.1,
+            "p95": 35,
+            "p99": 37.5,
+            "max": 38
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 27.4,
+              "avg": 31.6,
+              "med": 31.6,
+              "p90": 34,
+              "p95": 35.2,
+              "p99": 37.2,
+              "max": 37.2,
+              "throughput_rps": 41,
+              "total_duration_sec": 4.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 27.4,
+              "avg": 31.6,
+              "med": 31.5,
+              "p90": 34.3,
+              "p95": 35,
+              "p99": 38,
+              "max": 38,
+              "throughput_rps": 41.8,
+              "total_duration_sec": 4.8,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              31.6,
+              31.5
+            ],
+            "sd": 0.1,
+            "cv": 0.2
+          }
+        }
+      },
+      "echo_size": 200
+    },
+    "echo_VU10_N2000": {
+      "scenario": "echo",
+      "vu": 10,
+      "think_time_ms": 236,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 153,
+            "avg": 230.8,
+            "med": 168.3,
+            "p90": 180.8,
+            "p95": 188,
+            "p99": 2683.9,
+            "max": 2813.6
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 154.4,
+              "avg": 295.9,
+              "med": 171.4,
+              "p90": 187.6,
+              "p95": 2539.4,
+              "p99": 2738.3,
+              "max": 2813.6,
+              "throughput_rps": 15.1,
+              "total_duration_sec": 13.2,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 153,
+              "avg": 165.8,
+              "med": 165.4,
+              "p90": 175.3,
+              "p95": 179,
+              "p99": 186,
+              "max": 188,
+              "throughput_rps": 18.9,
+              "total_duration_sec": 10.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              171.4,
+              165.4
+            ],
+            "sd": 4.2,
+            "cv": 2.5
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 108.3,
+            "avg": 121.1,
+            "med": 119.1,
+            "p90": 134,
+            "p95": 137.3,
+            "p99": 146.4,
+            "max": 151.6
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 109.7,
+              "avg": 122,
+              "med": 119.3,
+              "p90": 135.3,
+              "p95": 137.8,
+              "p99": 151.2,
+              "max": 151.6,
+              "throughput_rps": 20.9,
+              "total_duration_sec": 9.6,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 108.3,
+              "avg": 120.2,
+              "med": 118.8,
+              "p90": 129.5,
+              "p95": 135.4,
+              "p99": 142.8,
+              "max": 146.9,
+              "throughput_rps": 21.2,
+              "total_duration_sec": 9.5,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              119.3,
+              118.8
+            ],
+            "sd": 0.4,
+            "cv": 0.3
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 106.2,
+            "avg": 120,
+            "med": 116.8,
+            "p90": 136.8,
+            "p95": 141.3,
+            "p99": 158.3,
+            "max": 170.5
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 107.6,
+              "avg": 121.4,
+              "med": 118.1,
+              "p90": 136.4,
+              "p95": 143.3,
+              "p99": 158.3,
+              "max": 165,
+              "throughput_rps": 20.3,
+              "total_duration_sec": 9.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 106.2,
+              "avg": 118.7,
+              "med": 115.6,
+              "p90": 137.7,
+              "p95": 140.6,
+              "p99": 161.4,
+              "max": 170.5,
+              "throughput_rps": 20,
+              "total_duration_sec": 10,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              118.1,
+              115.6
+            ],
+            "sd": 1.8,
+            "cv": 1.5
+          }
+        }
+      },
+      "echo_size": 2000
+    },
+    "echo_VU20_N200": {
+      "scenario": "echo",
+      "vu": 20,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 28,
+            "avg": 36,
+            "med": 35.3,
+            "p90": 41.1,
+            "p95": 43.3,
+            "p99": 48.2,
+            "max": 49.7
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 29.4,
+              "avg": 35.7,
+              "med": 35.2,
+              "p90": 39.9,
+              "p95": 42.1,
+              "p99": 46.6,
+              "max": 48.3,
+              "throughput_rps": 69,
+              "total_duration_sec": 5.8,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 28,
+              "avg": 36.4,
+              "med": 35.6,
+              "p90": 41.8,
+              "p95": 45.6,
+              "p99": 48.5,
+              "max": 49.7,
+              "throughput_rps": 71.5,
+              "total_duration_sec": 5.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              35.2,
+              35.6
+            ],
+            "sd": 0.3,
+            "cv": 0.8
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 28.8,
+            "avg": 36.4,
+            "med": 35.7,
+            "p90": 41.4,
+            "p95": 43.4,
+            "p99": 47.8,
+            "max": 49.5
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 30.4,
+              "avg": 37.9,
+              "med": 37.2,
+              "p90": 43.2,
+              "p95": 45.7,
+              "p99": 48.5,
+              "max": 49.5,
+              "throughput_rps": 66.7,
+              "total_duration_sec": 6,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 28.8,
+              "avg": 34.9,
+              "med": 34.7,
+              "p90": 37.7,
+              "p95": 38.7,
+              "p99": 41.1,
+              "max": 49.2,
+              "throughput_rps": 71.5,
+              "total_duration_sec": 5.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              37.2,
+              34.7
+            ],
+            "sd": 1.8,
+            "cv": 4.9
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 26.7,
+            "avg": 32.9,
+            "med": 32.3,
+            "p90": 36.6,
+            "p95": 38.7,
+            "p99": 53.4,
+            "max": 65.5
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 27.4,
+              "avg": 34.2,
+              "med": 33.5,
+              "p90": 38.4,
+              "p95": 42.6,
+              "p99": 57.9,
+              "max": 65.5,
+              "throughput_rps": 65,
+              "total_duration_sec": 6.2,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 26.7,
+              "avg": 31.6,
+              "med": 31.4,
+              "p90": 35,
+              "p95": 35.7,
+              "p99": 38.5,
+              "max": 40.5,
+              "throughput_rps": 70,
+              "total_duration_sec": 5.7,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              33.5,
+              31.4
+            ],
+            "sd": 1.5,
+            "cv": 4.6
+          }
+        }
+      },
+      "echo_size": 200
+    },
+    "products_VU10_PS10_CACHEWARM": {
+      "scenario": "products",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 28.5,
+            "avg": 33.4,
+            "med": 33.2,
+            "p90": 36.6,
+            "p95": 37.4,
+            "p99": 40.1,
+            "max": 41.7
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 30,
+              "avg": 34.2,
+              "med": 34.1,
+              "p90": 37.3,
+              "p95": 39.1,
+              "p99": 40.2,
+              "max": 41.7,
+              "throughput_rps": 40.8,
+              "total_duration_sec": 4.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 28.5,
+              "avg": 32.6,
+              "med": 32.6,
+              "p90": 34.9,
+              "p95": 35.2,
+              "p99": 37.7,
+              "max": 39.1,
+              "throughput_rps": 43.2,
+              "total_duration_sec": 4.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              34.1,
+              32.6
+            ],
+            "sd": 1.1,
+            "cv": 3.2
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 30.1,
+            "avg": 35,
+            "med": 34.1,
+            "p90": 39.3,
+            "p95": 42.2,
+            "p99": 50.7,
+            "max": 53.3
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 30.9,
+              "avg": 36.8,
+              "med": 35.5,
+              "p90": 42.2,
+              "p95": 45.7,
+              "p99": 51.2,
+              "max": 53.3,
+              "throughput_rps": 41.5,
+              "total_duration_sec": 4.8,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 30.1,
+              "avg": 33.1,
+              "med": 33.5,
+              "p90": 34.7,
+              "p95": 35.2,
+              "p99": 36.5,
+              "max": 36.7,
+              "throughput_rps": 43.6,
+              "total_duration_sec": 4.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              35.5,
+              33.5
+            ],
+            "sd": 1.4,
+            "cv": 4.1
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 27.9,
+            "avg": 166.5,
+            "med": 33.7,
+            "p90": 63.4,
+            "p95": 2600.6,
+            "p99": 2714.3,
+            "max": 2731.2
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 29.3,
+              "avg": 167.8,
+              "med": 34.4,
+              "p90": 63.4,
+              "p95": 2622.7,
+              "p99": 2715.8,
+              "max": 2731.2,
+              "throughput_rps": 26.5,
+              "total_duration_sec": 7.5,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 27.9,
+              "avg": 165.2,
+              "med": 33.5,
+              "p90": 68,
+              "p95": 2600.6,
+              "p99": 2661.4,
+              "max": 2677.2,
+              "throughput_rps": 27.2,
+              "total_duration_sec": 7.4,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              34.4,
+              33.5
+            ],
+            "sd": 0.6,
+            "cv": 1.9
+          }
+        }
+      },
+      "page_size": 10,
+      "cache": "warm"
+    },
+    "products_VU10_PS10_CACHECOLD": {
+      "scenario": "products",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 30.9,
+            "avg": 49.2,
+            "med": 36.7,
+            "p90": 91.1,
+            "p95": 93.4,
+            "p99": 99.7,
+            "max": 100.2
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 30.9,
+              "avg": 36.5,
+              "med": 35.8,
+              "p90": 41,
+              "p95": 45.1,
+              "p99": 47.2,
+              "max": 47.3,
+              "throughput_rps": 40.3,
+              "total_duration_sec": 5,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 31.8,
+              "avg": 62,
+              "med": 52.3,
+              "p90": 93.4,
+              "p95": 99,
+              "p99": 100,
+              "max": 100.2,
+              "throughput_rps": 38.3,
+              "total_duration_sec": 5.2,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              35.8,
+              52.3
+            ],
+            "sd": 11.7,
+            "cv": 26.5
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 32,
+            "avg": 75.3,
+            "med": 89.2,
+            "p90": 99.1,
+            "p95": 100.5,
+            "p99": 105,
+            "max": 105.6
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 32,
+              "avg": 65.9,
+              "med": 70.8,
+              "p90": 99.6,
+              "p95": 101,
+              "p99": 105.1,
+              "max": 105.6,
+              "throughput_rps": 37.1,
+              "total_duration_sec": 5.4,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 32.4,
+              "avg": 84.7,
+              "med": 94.7,
+              "p90": 99.1,
+              "p95": 100.5,
+              "p99": 104.9,
+              "max": 105.3,
+              "throughput_rps": 34.7,
+              "total_duration_sec": 5.8,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              70.8,
+              94.7
+            ],
+            "sd": 16.9,
+            "cv": 20.4
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 28.9,
+            "avg": 56.6,
+            "med": 38.5,
+            "p90": 96.8,
+            "p95": 99.5,
+            "p99": 101.6,
+            "max": 104.8
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 28.9,
+              "avg": 38.1,
+              "med": 35.8,
+              "p90": 41.1,
+              "p95": 42.2,
+              "p99": 103,
+              "max": 103.4,
+              "throughput_rps": 39.5,
+              "total_duration_sec": 5.1,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 29.4,
+              "avg": 75.1,
+              "med": 88.4,
+              "p90": 99.3,
+              "p95": 100.2,
+              "p99": 101.6,
+              "max": 104.8,
+              "throughput_rps": 35.1,
+              "total_duration_sec": 5.7,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              35.8,
+              88.4
+            ],
+            "sd": 37.2,
+            "cv": 59.9
+          }
+        }
+      },
+      "page_size": 10,
+      "cache": "cold"
+    },
+    "products_VU10_PS500_CACHEWARM": {
+      "scenario": "products",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 55.5,
+            "avg": 63.9,
+            "med": 63.8,
+            "p90": 67.8,
+            "p95": 70,
+            "p99": 74.5,
+            "max": 77.8
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 55.5,
+              "avg": 64.1,
+              "med": 64.3,
+              "p90": 67.5,
+              "p95": 69.3,
+              "p99": 72,
+              "max": 77.2,
+              "throughput_rps": 36.8,
+              "total_duration_sec": 5.4,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 55.8,
+              "avg": 63.7,
+              "med": 63.4,
+              "p90": 68.6,
+              "p95": 71.5,
+              "p99": 77.6,
+              "max": 77.8,
+              "throughput_rps": 36.8,
+              "total_duration_sec": 5.4,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              64.3,
+              63.4
+            ],
+            "sd": 0.6,
+            "cv": 1
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 34.7,
+            "avg": 43.7,
+            "med": 43.7,
+            "p90": 48.9,
+            "p95": 51.7,
+            "p99": 55.6,
+            "max": 56.8
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 34.7,
+              "avg": 44.4,
+              "med": 44.6,
+              "p90": 48.9,
+              "p95": 51.9,
+              "p99": 55.7,
+              "max": 56.8,
+              "throughput_rps": 38.9,
+              "total_duration_sec": 5.1,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 35.1,
+              "avg": 43,
+              "med": 42.1,
+              "p90": 49.7,
+              "p95": 51.7,
+              "p99": 55.6,
+              "max": 55.6,
+              "throughput_rps": 40.4,
+              "total_duration_sec": 5,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              44.6,
+              42.1
+            ],
+            "sd": 1.8,
+            "cv": 4.1
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 32.3,
+            "avg": 41.1,
+            "med": 40.4,
+            "p90": 47,
+            "p95": 49.4,
+            "p99": 56.5,
+            "max": 58.6
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 34.2,
+              "avg": 42,
+              "med": 40.8,
+              "p90": 48,
+              "p95": 51.4,
+              "p99": 57.8,
+              "max": 58.6,
+              "throughput_rps": 39.1,
+              "total_duration_sec": 5.1,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 32.3,
+              "avg": 40.2,
+              "med": 40,
+              "p90": 45,
+              "p95": 46.8,
+              "p99": 53.4,
+              "max": 55,
+              "throughput_rps": 38.6,
+              "total_duration_sec": 5.2,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              40.8,
+              40
+            ],
+            "sd": 0.6,
+            "cv": 1.4
+          }
+        }
+      },
+      "page_size": 500,
+      "cache": "warm"
+    },
+    "products_VU10_PS500_CACHECOLD": {
+      "scenario": "products",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 59,
+            "avg": 80.8,
+            "med": 77.2,
+            "p90": 101.5,
+            "p95": 107.1,
+            "p99": 137.3,
+            "max": 149.7
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 64.7,
+              "avg": 93.2,
+              "med": 92.6,
+              "p90": 107.1,
+              "p95": 115.8,
+              "p99": 147.3,
+              "max": 149.7,
+              "throughput_rps": 31.5,
+              "total_duration_sec": 6.3,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 59,
+              "avg": 68.4,
+              "med": 67.5,
+              "p90": 76.8,
+              "p95": 79.6,
+              "p99": 91.5,
+              "max": 91.7,
+              "throughput_rps": 35.8,
+              "total_duration_sec": 5.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              92.6,
+              67.5
+            ],
+            "sd": 17.7,
+            "cv": 22.2
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 36.6,
+            "avg": 83.7,
+            "med": 88.8,
+            "p90": 104.9,
+            "p95": 108.5,
+            "p99": 117.6,
+            "max": 125.8
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 39.4,
+              "avg": 85.9,
+              "med": 89.7,
+              "p90": 105.3,
+              "p95": 107.7,
+              "p99": 114.5,
+              "max": 116.4,
+              "throughput_rps": 34,
+              "total_duration_sec": 5.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 36.6,
+              "avg": 81.5,
+              "med": 87.3,
+              "p90": 104.1,
+              "p95": 109.3,
+              "p99": 124.4,
+              "max": 125.8,
+              "throughput_rps": 33.9,
+              "total_duration_sec": 5.9,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              89.7,
+              87.3
+            ],
+            "sd": 1.7,
+            "cv": 1.9
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 33.6,
+            "avg": 63.2,
+            "med": 45.8,
+            "p90": 100.3,
+            "p95": 104.5,
+            "p99": 114.1,
+            "max": 126.2
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 35.5,
+              "avg": 86.1,
+              "med": 91.9,
+              "p90": 104.5,
+              "p95": 106.7,
+              "p99": 117.4,
+              "max": 126.2,
+              "throughput_rps": 32.3,
+              "total_duration_sec": 6.2,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 33.6,
+              "avg": 40.2,
+              "med": 39.8,
+              "p90": 45.2,
+              "p95": 46.5,
+              "p99": 51,
+              "max": 51.2,
+              "throughput_rps": 39.2,
+              "total_duration_sec": 5.1,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              91.9,
+              39.8
+            ],
+            "sd": 36.8,
+            "cv": 55.9
+          }
+        }
+      },
+      "page_size": 500,
+      "cache": "cold"
+    },
+    "products_VU10_PS2000_CACHEWARM": {
+      "scenario": "products",
+      "vu": 10,
+      "think_time_ms": 174,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 127.8,
+            "avg": 205.7,
+            "med": 139.4,
+            "p90": 148.7,
+            "p95": 154.5,
+            "p99": 2826.6,
+            "max": 2854.5
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 129,
+              "avg": 272.2,
+              "med": 140.7,
+              "p90": 152.1,
+              "p95": 2636.7,
+              "p99": 2837.2,
+              "max": 2854.5,
+              "throughput_rps": 17.5,
+              "total_duration_sec": 11.4,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 127.8,
+              "avg": 139.2,
+              "med": 138.3,
+              "p90": 146.8,
+              "p95": 148.4,
+              "p99": 156,
+              "max": 158.2,
+              "throughput_rps": 23.1,
+              "total_duration_sec": 8.7,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              140.7,
+              138.3
+            ],
+            "sd": 1.7,
+            "cv": 1.2
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 86.9,
+            "avg": 162.1,
+            "med": 97.3,
+            "p90": 104.9,
+            "p95": 109.4,
+            "p99": 2700.9,
+            "max": 2798.1
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 86.9,
+              "avg": 98.4,
+              "med": 98.3,
+              "p90": 105.8,
+              "p95": 109.4,
+              "p99": 114.4,
+              "max": 116.3,
+              "throughput_rps": 26.1,
+              "total_duration_sec": 7.7,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 87.5,
+              "avg": 225.8,
+              "med": 96.4,
+              "p90": 102.9,
+              "p95": 2626.2,
+              "p99": 2783,
+              "max": 2798.1,
+              "throughput_rps": 19.4,
+              "total_duration_sec": 10.3,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              98.3,
+              96.4
+            ],
+            "sd": 1.3,
+            "cv": 1.4
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 84,
+            "avg": 93.8,
+            "med": 92.1,
+            "p90": 102.7,
+            "p95": 113.2,
+            "p99": 121.7,
+            "max": 125.9
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 84,
+              "avg": 92.6,
+              "med": 90.3,
+              "p90": 102.7,
+              "p95": 113.1,
+              "p99": 121.7,
+              "max": 124.3,
+              "throughput_rps": 25.8,
+              "total_duration_sec": 7.7,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 84.8,
+              "avg": 95.1,
+              "med": 93.6,
+              "p90": 102.8,
+              "p95": 113.8,
+              "p99": 124.8,
+              "max": 125.9,
+              "throughput_rps": 25.9,
+              "total_duration_sec": 7.7,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              90.3,
+              93.6
+            ],
+            "sd": 2.3,
+            "cv": 2.5
+          }
+        }
+      },
+      "page_size": 2000,
+      "cache": "warm"
+    },
+    "products_VU10_PS2000_CACHECOLD": {
+      "scenario": "products",
+      "vu": 10,
+      "think_time_ms": 174,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 135.1,
+            "avg": 162.6,
+            "med": 148.3,
+            "p90": 209.7,
+            "p95": 216.5,
+            "p99": 229.1,
+            "max": 237.2
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 135.1,
+              "avg": 147.2,
+              "med": 145.6,
+              "p90": 156.6,
+              "p95": 168,
+              "p99": 185.5,
+              "max": 195.1,
+              "throughput_rps": 22.5,
+              "total_duration_sec": 8.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 136.5,
+              "avg": 178,
+              "med": 188.6,
+              "p90": 216.5,
+              "p95": 224.8,
+              "p99": 232.6,
+              "max": 237.2,
+              "throughput_rps": 20.7,
+              "total_duration_sec": 9.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              145.6,
+              188.6
+            ],
+            "sd": 30.4,
+            "cv": 18.2
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 91.5,
+            "avg": 116.2,
+            "med": 115.8,
+            "p90": 133.9,
+            "p95": 143.7,
+            "p99": 157.5,
+            "max": 172
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 91.5,
+              "avg": 110,
+              "med": 106,
+              "p90": 128.6,
+              "p95": 138.2,
+              "p99": 150.2,
+              "max": 157.5,
+              "throughput_rps": 25.4,
+              "total_duration_sec": 7.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 91.8,
+              "avg": 122.3,
+              "med": 120.8,
+              "p90": 136.5,
+              "p95": 145.3,
+              "p99": 163.9,
+              "max": 172,
+              "throughput_rps": 24.2,
+              "total_duration_sec": 8.3,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              106,
+              120.8
+            ],
+            "sd": 10.5,
+            "cv": 9.2
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 90.2,
+            "avg": 121.7,
+            "med": 121.5,
+            "p90": 136.9,
+            "p95": 143.2,
+            "p99": 152,
+            "max": 163.4
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 90.2,
+              "avg": 121.6,
+              "med": 122.1,
+              "p90": 135.8,
+              "p95": 141.4,
+              "p99": 152,
+              "max": 163.4,
+              "throughput_rps": 23.6,
+              "total_duration_sec": 8.5,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 95.2,
+              "avg": 121.8,
+              "med": 120.8,
+              "p90": 139.5,
+              "p95": 143.7,
+              "p99": 159.9,
+              "max": 162.7,
+              "throughput_rps": 23.5,
+              "total_duration_sec": 8.5,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              122.1,
+              120.8
+            ],
+            "sd": 0.9,
+            "cv": 0.8
+          }
+        }
+      },
+      "page_size": 2000,
+      "cache": "cold"
+    },
+    "products_VU20_PS10_CACHEWARM": {
+      "scenario": "products",
+      "vu": 20,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 29,
+            "avg": 38.7,
+            "med": 38,
+            "p90": 44.6,
+            "p95": 47.3,
+            "p99": 49.9,
+            "max": 58.3
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 29,
+              "avg": 36.4,
+              "med": 36,
+              "p90": 40.8,
+              "p95": 43.2,
+              "p99": 47.4,
+              "max": 48.4,
+              "throughput_rps": 69.9,
+              "total_duration_sec": 5.7,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 29.2,
+              "avg": 41,
+              "med": 41.4,
+              "p90": 46.8,
+              "p95": 48.5,
+              "p99": 54.2,
+              "max": 58.3,
+              "throughput_rps": 66.3,
+              "total_duration_sec": 6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              36,
+              41.4
+            ],
+            "sd": 3.8,
+            "cv": 9.9
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 30.1,
+            "avg": 36.7,
+            "med": 35.9,
+            "p90": 41.9,
+            "p95": 44.1,
+            "p99": 50.2,
+            "max": 53.2
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 30.2,
+              "avg": 37.9,
+              "med": 37,
+              "p90": 43.1,
+              "p95": 45.6,
+              "p99": 52.4,
+              "max": 53.2,
+              "throughput_rps": 69,
+              "total_duration_sec": 5.8,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 30.1,
+              "avg": 35.6,
+              "med": 35.1,
+              "p90": 38.2,
+              "p95": 40.7,
+              "p99": 50.1,
+              "max": 50.5,
+              "throughput_rps": 70.5,
+              "total_duration_sec": 5.7,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              37,
+              35.1
+            ],
+            "sd": 1.3,
+            "cv": 3.7
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 28,
+            "avg": 170.7,
+            "med": 36.9,
+            "p90": 57.7,
+            "p95": 2592.9,
+            "p99": 2701.8,
+            "max": 2715.6
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 28,
+              "avg": 170.2,
+              "med": 35.6,
+              "p90": 57.7,
+              "p95": 2592.9,
+              "p99": 2705.1,
+              "max": 2715.6,
+              "throughput_rps": 45.2,
+              "total_duration_sec": 8.8,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 28.2,
+              "avg": 171.2,
+              "med": 37.4,
+              "p90": 59,
+              "p95": 2679.5,
+              "p99": 2697.4,
+              "max": 2701.9,
+              "throughput_rps": 43.8,
+              "total_duration_sec": 9.1,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              35.6,
+              37.4
+            ],
+            "sd": 1.3,
+            "cv": 3.5
+          }
+        }
+      },
+      "page_size": 10,
+      "cache": "warm"
+    },
+    "products_VU20_PS10_CACHECOLD": {
+      "scenario": "products",
+      "vu": 20,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 32.1,
+            "avg": 67.2,
+            "med": 74.5,
+            "p90": 97.3,
+            "p95": 101.7,
+            "p99": 109.9,
+            "max": 118.4
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 32.4,
+              "avg": 79.1,
+              "med": 86.6,
+              "p90": 100.8,
+              "p95": 103.7,
+              "p99": 112.6,
+              "max": 118.4,
+              "throughput_rps": 58,
+              "total_duration_sec": 6.9,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 32.1,
+              "avg": 55.3,
+              "med": 42.4,
+              "p90": 93.3,
+              "p95": 97.2,
+              "p99": 104.1,
+              "max": 114,
+              "throughput_rps": 63,
+              "total_duration_sec": 6.4,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              86.6,
+              42.4
+            ],
+            "sd": 31.3,
+            "cv": 48.5
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 31.5,
+            "avg": 60.8,
+            "med": 42.9,
+            "p90": 96.4,
+            "p95": 99.5,
+            "p99": 104,
+            "max": 112.9
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 31.5,
+              "avg": 81.3,
+              "med": 90.1,
+              "p90": 99.5,
+              "p95": 101.7,
+              "p99": 108.1,
+              "max": 112.9,
+              "throughput_rps": 58.8,
+              "total_duration_sec": 6.8,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 33.4,
+              "avg": 40.3,
+              "med": 40.1,
+              "p90": 43.1,
+              "p95": 44.3,
+              "p99": 53.9,
+              "max": 61.1,
+              "throughput_rps": 67,
+              "total_duration_sec": 6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              90.1,
+              40.1
+            ],
+            "sd": 35.4,
+            "cv": 54.3
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 29.4,
+            "avg": 72,
+            "med": 84.2,
+            "p90": 95.5,
+            "p95": 97.9,
+            "p99": 102.7,
+            "max": 106.3
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 29.4,
+              "avg": 76.8,
+              "med": 85.7,
+              "p90": 95.3,
+              "p95": 98,
+              "p99": 99.7,
+              "max": 102.8,
+              "throughput_rps": 57.1,
+              "total_duration_sec": 7,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 30.4,
+              "avg": 67.2,
+              "med": 76.9,
+              "p90": 95.9,
+              "p95": 97.8,
+              "p99": 103.2,
+              "max": 106.3,
+              "throughput_rps": 58.9,
+              "total_duration_sec": 6.8,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              85.7,
+              76.9
+            ],
+            "sd": 6.2,
+            "cv": 7.7
+          }
+        }
+      },
+      "page_size": 10,
+      "cache": "cold"
+    },
+    "products_VU20_PS500_CACHEWARM": {
+      "scenario": "products",
+      "vu": 20,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 56.8,
+            "avg": 72.1,
+            "med": 70,
+            "p90": 83.1,
+            "p95": 89.2,
+            "p99": 100.6,
+            "max": 108.7
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 56.8,
+              "avg": 72.3,
+              "med": 69.5,
+              "p90": 85.7,
+              "p95": 90.7,
+              "p99": 103.7,
+              "max": 108.7,
+              "throughput_rps": 57.3,
+              "total_duration_sec": 7,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 59.9,
+              "avg": 72,
+              "med": 70.6,
+              "p90": 80.4,
+              "p95": 85.7,
+              "p99": 100.2,
+              "max": 105.9,
+              "throughput_rps": 59.2,
+              "total_duration_sec": 6.8,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              69.5,
+              70.6
+            ],
+            "sd": 0.8,
+            "cv": 1.1
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 35.5,
+            "avg": 50.8,
+            "med": 47.3,
+            "p90": 63.3,
+            "p95": 74.1,
+            "p99": 105.7,
+            "max": 137.4
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 35.5,
+              "avg": 53.3,
+              "med": 49.3,
+              "p90": 71.2,
+              "p95": 83.5,
+              "p99": 113,
+              "max": 137.4,
+              "throughput_rps": 63.9,
+              "total_duration_sec": 6.3,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 36.7,
+              "avg": 48.3,
+              "med": 45.8,
+              "p90": 59.4,
+              "p95": 67.1,
+              "p99": 78.2,
+              "max": 88.8,
+              "throughput_rps": 64.1,
+              "total_duration_sec": 6.2,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              49.3,
+              45.8
+            ],
+            "sd": 2.5,
+            "cv": 5.2
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 33.4,
+            "avg": 45.7,
+            "med": 44.3,
+            "p90": 53.3,
+            "p95": 58.8,
+            "p99": 69.9,
+            "max": 100.5
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 33.4,
+              "avg": 46.6,
+              "med": 45.2,
+              "p90": 55.8,
+              "p95": 61.2,
+              "p99": 78.1,
+              "max": 100.5,
+              "throughput_rps": 61.2,
+              "total_duration_sec": 6.5,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 34,
+              "avg": 44.8,
+              "med": 43.7,
+              "p90": 51.3,
+              "p95": 55,
+              "p99": 67.4,
+              "max": 85.9,
+              "throughput_rps": 60.9,
+              "total_duration_sec": 6.6,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              45.2,
+              43.7
+            ],
+            "sd": 1.1,
+            "cv": 2.4
+          }
+        }
+      },
+      "page_size": 500,
+      "cache": "warm"
+    },
+    "products_VU20_PS500_CACHECOLD": {
+      "scenario": "products",
+      "vu": 20,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 64.6,
+            "avg": 93.7,
+            "med": 91.4,
+            "p90": 112.8,
+            "p95": 120.9,
+            "p99": 151.1,
+            "max": 169.4
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 64.6,
+              "avg": 93.1,
+              "med": 92.3,
+              "p90": 109.7,
+              "p95": 118.9,
+              "p99": 151.1,
+              "max": 169.4,
+              "throughput_rps": 54.7,
+              "total_duration_sec": 7.3,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 66.7,
+              "avg": 94.3,
+              "med": 91,
+              "p90": 113.8,
+              "p95": 129.5,
+              "p99": 151.8,
+              "max": 158.8,
+              "throughput_rps": 53.6,
+              "total_duration_sec": 7.5,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              92.3,
+              91
+            ],
+            "sd": 0.9,
+            "cv": 1
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 38.9,
+            "avg": 68.5,
+            "med": 59.6,
+            "p90": 103.6,
+            "p95": 112.1,
+            "p99": 130.7,
+            "max": 151.2
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 38.9,
+              "avg": 57.1,
+              "med": 51.9,
+              "p90": 78.9,
+              "p95": 89.5,
+              "p99": 105.9,
+              "max": 122.1,
+              "throughput_rps": 61.9,
+              "total_duration_sec": 6.5,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 40.3,
+              "avg": 79.9,
+              "med": 81.7,
+              "p90": 111.4,
+              "p95": 119.7,
+              "p99": 142.9,
+              "max": 151.2,
+              "throughput_rps": 56.4,
+              "total_duration_sec": 7.1,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              51.9,
+              81.7
+            ],
+            "sd": 21.1,
+            "cv": 31.5
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 36.9,
+            "avg": 152.7,
+            "med": 88.4,
+            "p90": 113,
+            "p95": 129.8,
+            "p99": 2774.4,
+            "max": 2829.7
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 36.9,
+              "avg": 85.5,
+              "med": 85.7,
+              "p90": 111.6,
+              "p95": 119.2,
+              "p99": 160,
+              "max": 180.6,
+              "throughput_rps": 42.8,
+              "total_duration_sec": 9.3,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 38.6,
+              "avg": 220,
+              "med": 89.8,
+              "p90": 115.5,
+              "p95": 2665,
+              "p99": 2803.5,
+              "max": 2829.7,
+              "throughput_rps": 38.8,
+              "total_duration_sec": 10.3,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              85.7,
+              89.8
+            ],
+            "sd": 2.9,
+            "cv": 3.3
+          }
+        }
+      },
+      "page_size": 500,
+      "cache": "cold"
+    },
+    "orders_VU10_IT1": {
+      "scenario": "orders",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 30.1,
+            "avg": 84.3,
+            "med": 93.2,
+            "p90": 100.4,
+            "p95": 102.1,
+            "p99": 107.5,
+            "max": 110.8
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 30.1,
+              "avg": 86.6,
+              "med": 93.5,
+              "p90": 102.1,
+              "p95": 103,
+              "p99": 109.4,
+              "max": 110.8,
+              "throughput_rps": 33.3,
+              "total_duration_sec": 6,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 31.9,
+              "avg": 82.1,
+              "med": 93.2,
+              "p90": 99.7,
+              "p95": 100.4,
+              "p99": 101.7,
+              "max": 103.3,
+              "throughput_rps": 34.2,
+              "total_duration_sec": 5.8,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              93.5,
+              93.2
+            ],
+            "sd": 0.2,
+            "cv": 0.2
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 32,
+            "avg": 86.8,
+            "med": 94.5,
+            "p90": 100.1,
+            "p95": 101.4,
+            "p99": 106.6,
+            "max": 112.7
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 33.5,
+              "avg": 89.5,
+              "med": 95.6,
+              "p90": 100.9,
+              "p95": 102,
+              "p99": 109,
+              "max": 112.7,
+              "throughput_rps": 33.4,
+              "total_duration_sec": 6,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 32,
+              "avg": 84.1,
+              "med": 92.2,
+              "p90": 99.7,
+              "p95": 101,
+              "p99": 106,
+              "max": 106.6,
+              "throughput_rps": 32.7,
+              "total_duration_sec": 6.1,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              95.6,
+              92.2
+            ],
+            "sd": 2.4,
+            "cv": 2.6
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 29.9,
+            "avg": 58.2,
+            "med": 37.1,
+            "p90": 97,
+            "p95": 99,
+            "p99": 104.6,
+            "max": 110.2
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 30.4,
+              "avg": 82.5,
+              "med": 89.6,
+              "p90": 99,
+              "p95": 101.2,
+              "p99": 105.8,
+              "max": 110.2,
+              "throughput_rps": 31.2,
+              "total_duration_sec": 6.4,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 29.9,
+              "avg": 34,
+              "med": 33.8,
+              "p90": 37.1,
+              "p95": 38.6,
+              "p99": 44.5,
+              "max": 45,
+              "throughput_rps": 38.7,
+              "total_duration_sec": 5.2,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              89.6,
+              33.8
+            ],
+            "sd": 39.5,
+            "cv": 63.9
+          }
+        }
+      },
+      "order_items": 1
+    },
+    "orders_VU10_IT50": {
+      "scenario": "orders",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 51.5,
+            "avg": 97.8,
+            "med": 94.3,
+            "p90": 106.9,
+            "p95": 160.5,
+            "p99": 198.9,
+            "max": 278.1
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 53.2,
+              "avg": 96.6,
+              "med": 91.9,
+              "p90": 106.9,
+              "p95": 160.5,
+              "p99": 185.3,
+              "max": 278.1,
+              "throughput_rps": 30.7,
+              "total_duration_sec": 6.5,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 51.5,
+              "avg": 99,
+              "med": 95.6,
+              "p90": 108.8,
+              "p95": 161.8,
+              "p99": 199,
+              "max": 199.2,
+              "throughput_rps": 31.7,
+              "total_duration_sec": 6.3,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              91.9,
+              95.6
+            ],
+            "sd": 2.6,
+            "cv": 2.8
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 44,
+            "avg": 83.6,
+            "med": 83.3,
+            "p90": 117.1,
+            "p95": 166.1,
+            "p99": 193.9,
+            "max": 198.3
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 44.3,
+              "avg": 96,
+              "med": 93.7,
+              "p90": 165,
+              "p95": 176.9,
+              "p99": 198.3,
+              "max": 198.3,
+              "throughput_rps": 30.8,
+              "total_duration_sec": 6.5,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 44,
+              "avg": 71.2,
+              "med": 57.4,
+              "p90": 104.3,
+              "p95": 117.3,
+              "p99": 135.6,
+              "max": 181.4,
+              "throughput_rps": 34.6,
+              "total_duration_sec": 5.8,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              93.7,
+              57.4
+            ],
+            "sd": 25.7,
+            "cv": 34
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 43,
+            "avg": 79.1,
+            "med": 77.1,
+            "p90": 104.6,
+            "p95": 160.6,
+            "p99": 206.3,
+            "max": 222
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 48.4,
+              "avg": 103.9,
+              "med": 96.8,
+              "p90": 160.6,
+              "p95": 187,
+              "p99": 222,
+              "max": 222,
+              "throughput_rps": 29,
+              "total_duration_sec": 6.9,
+              "errors": 0
+            },
+            {
+              "count": 200,
+              "min": 43,
+              "avg": 54.4,
+              "med": 51,
+              "p90": 65.4,
+              "p95": 77.5,
+              "p99": 104.1,
+              "max": 104.3,
+              "throughput_rps": 37.6,
+              "total_duration_sec": 5.3,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              96.8,
+              51
+            ],
+            "sd": 32.4,
+            "cv": 43.8
+          }
+        }
+      },
+      "order_items": 50
+    },
+    "orders_VU20_IT1": {
+      "scenario": "orders",
+      "vu": 20,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 30.9,
+            "avg": 56.4,
+            "med": 41.7,
+            "p90": 95.9,
+            "p95": 99.5,
+            "p99": 103.8,
+            "max": 110.7
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 30.9,
+              "avg": 38.9,
+              "med": 37,
+              "p90": 45.5,
+              "p95": 50,
+              "p99": 78.5,
+              "max": 79,
+              "throughput_rps": 67.6,
+              "total_duration_sec": 5.9,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 31,
+              "avg": 73.9,
+              "med": 84.7,
+              "p90": 99.5,
+              "p95": 101.6,
+              "p99": 104.6,
+              "max": 110.7,
+              "throughput_rps": 59.7,
+              "total_duration_sec": 6.7,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              37,
+              84.7
+            ],
+            "sd": 33.7,
+            "cv": 55.4
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 30.9,
+            "avg": 109.8,
+            "med": 92,
+            "p90": 102.3,
+            "p95": 106.3,
+            "p99": 138.7,
+            "max": 2782.8
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 30.9,
+              "avg": 131,
+              "med": 92,
+              "p90": 102.3,
+              "p95": 106.7,
+              "p99": 2780,
+              "max": 2782.8,
+              "throughput_rps": 41.7,
+              "total_duration_sec": 9.6,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 35,
+              "avg": 88.6,
+              "med": 91.8,
+              "p90": 102.4,
+              "p95": 106.3,
+              "p99": 112.6,
+              "max": 138.7,
+              "throughput_rps": 57.7,
+              "total_duration_sec": 6.9,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              92,
+              91.8
+            ],
+            "sd": 0.1,
+            "cv": 0.2
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 29.7,
+            "avg": 126.2,
+            "med": 53.8,
+            "p90": 95.7,
+            "p95": 101.6,
+            "p99": 2699,
+            "max": 2710.3
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 29.7,
+              "avg": 39.9,
+              "med": 38,
+              "p90": 47.5,
+              "p95": 57.8,
+              "p99": 76.7,
+              "max": 79.1,
+              "throughput_rps": 64.7,
+              "total_duration_sec": 6.2,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 31.2,
+              "avg": 212.5,
+              "med": 87.5,
+              "p90": 101.6,
+              "p95": 2591.9,
+              "p99": 2699.7,
+              "max": 2710.3,
+              "throughput_rps": 41.4,
+              "total_duration_sec": 9.7,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              38,
+              87.5
+            ],
+            "sd": 35,
+            "cv": 55.8
+          }
+        }
+      },
+      "order_items": 1
+    },
+    "orders_VU20_IT50": {
+      "scenario": "orders",
+      "vu": 20,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 44.8,
+            "avg": 171.3,
+            "med": 186.8,
+            "p90": 278.6,
+            "p95": 287.7,
+            "p99": 300.7,
+            "max": 317.9
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 44.8,
+              "avg": 168.5,
+              "med": 188.4,
+              "p90": 284.5,
+              "p95": 291.7,
+              "p99": 300.7,
+              "max": 317.9,
+              "throughput_rps": 44.4,
+              "total_duration_sec": 9,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 53.9,
+              "avg": 174.1,
+              "med": 186,
+              "p90": 234.5,
+              "p95": 281.2,
+              "p99": 303.6,
+              "max": 309.1,
+              "throughput_rps": 44.1,
+              "total_duration_sec": 9.1,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              188.4,
+              186
+            ],
+            "sd": 1.7,
+            "cv": 0.9
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 50.9,
+            "avg": 178.9,
+            "med": 186.6,
+            "p90": 271.7,
+            "p95": 289.3,
+            "p99": 297.3,
+            "max": 311.7
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 57.8,
+              "avg": 190.6,
+              "med": 188,
+              "p90": 288.9,
+              "p95": 294.9,
+              "p99": 301.1,
+              "max": 311.7,
+              "throughput_rps": 42,
+              "total_duration_sec": 9.5,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 50.9,
+              "avg": 167.2,
+              "med": 183.3,
+              "p90": 211.6,
+              "p95": 219.9,
+              "p99": 275.6,
+              "max": 295.6,
+              "throughput_rps": 43.9,
+              "total_duration_sec": 9.1,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              188,
+              183.3
+            ],
+            "sd": 3.3,
+            "cv": 1.8
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 800,
+          "errors": 0,
+          "stats": {
+            "count": 800,
+            "min": 43.9,
+            "avg": 169.6,
+            "med": 182.7,
+            "p90": 281.5,
+            "p95": 288.2,
+            "p99": 298.4,
+            "max": 307
+          },
+          "per_run": [
+            {
+              "count": 400,
+              "min": 56.1,
+              "avg": 197.1,
+              "med": 191.7,
+              "p90": 287.2,
+              "p95": 293,
+              "p99": 303.2,
+              "max": 307,
+              "throughput_rps": 40,
+              "total_duration_sec": 10,
+              "errors": 0
+            },
+            {
+              "count": 400,
+              "min": 43.9,
+              "avg": 142.2,
+              "med": 137.4,
+              "p90": 210.5,
+              "p95": 271.8,
+              "p99": 293.5,
+              "max": 297.4,
+              "throughput_rps": 47.6,
+              "total_duration_sec": 8.4,
+              "errors": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              191.7,
+              137.4
+            ],
+            "sd": 38.4,
+            "cv": 23.3
+          }
+        }
+      },
+      "order_items": 50
+    }
+  }
+}

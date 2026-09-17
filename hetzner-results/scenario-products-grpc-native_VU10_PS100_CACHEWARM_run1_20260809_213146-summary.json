@@ -1,0 +1,92 @@
+{
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "name": "status OK",
+                    "path": "::status OK",
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 77979,
+                    "fails": 0
+                },
+                "has products": {
+                    "name": "has products",
+                    "path": "::has products",
+                    "id": "bd20344dacb9319039907d7c96ed89b0",
+                    "passes": 77979,
+                    "fails": 0
+                }
+            },
+        "name": "",
+        "path": ""
+    },
+    "metrics": {
+        "grpc_native_products_errors": {
+            "passes": 0,
+            "fails": 77979,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "grpc_req_duration": {
+            "min": 0.860301,
+            "med": 1.644237,
+            "max": 15.334254,
+            "p(90)": 3.515587,
+            "p(95)": 4.541966099999998,
+            "p(99)": 7.059363580000006,
+            "avg": 2.09129018706319,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "data_sent": {
+            "count": 5749467,
+            "rate": 47909.65658087757
+        },
+        "data_received": {
+            "count": 584330047,
+            "rate": 4869156.024664208
+        },
+        "checks": {
+            "passes": 155958,
+            "fails": 0,
+            "value": 1
+        },
+        "iterations": {
+            "count": 77979,
+            "rate": 649.7901649875114
+        },
+        "grpc_native_products_latency": {
+            "min": 1,
+            "med": 3,
+            "max": 17,
+            "p(90)": 5,
+            "p(95)": 6,
+            "p(99)": 8,
+            "avg": 2.927147052411547
+        },
+        "iteration_duration": {
+            "med": 13.086849,
+            "max": 26.870011,
+            "p(90)": 15.412569199999998,
+            "p(95)": 16.486351799999998,
+            "p(99)": 19.022445680000004,
+            "avg": 13.510618355364926,
+            "min": 11.433546
+        },
+        "vus_max": {
+            "min": 10,
+            "max": 10,
+            "value": 10
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 10
+        }
+    }
+}

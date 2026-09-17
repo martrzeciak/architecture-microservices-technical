@@ -11,27 +11,45 @@ import numpy as np
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'hetzner-results')
 OUTPUT_DIR = os.path.dirname(__file__)
 
-# Helper to load metric from k6 summary JSON
-def load_metric(filename, metric_path='http_req_duration'):
+# Trzy niezalezne przebiegi calej macierzy testowej.
+# Wszystkie wartosci na wykresach to SREDNIA z tych przebiegow.
+ALL_RUNS = ['20260805_122120', '20260808_142257', '20260808_201447']
+
+
+def _read(filename, metric_path):
     filepath = os.path.join(RESULTS_DIR, filename)
+    if not os.path.exists(filepath):
+        return None
     with open(filepath, 'r') as f:
         data = json.load(f)
-    metrics = data.get('metrics', {})
-    m = metrics.get(metric_path, {})
-    return {
-        'avg': m.get('avg', 0),
-        'med': m.get('med', 0),
-        'p95': m.get('p(95)', 0),
-        'p99': m.get('p(99)', 0),
-    }
+    return data.get('metrics', {}).get(metric_path)
+
+
+def load_metric(filename, metric_path='http_req_duration'):
+    """Srednia z trzech przebiegow. 'filename' musi zawierac znacznik pierwszego przebiegu."""
+    acc = {'avg': [], 'med': [], 'p90': [], 'p95': [], 'p99': []}
+    for run in ALL_RUNS:
+        fn = filename.replace(ALL_RUNS[0], run)
+        m = _read(fn, metric_path)
+        if not m:
+            continue
+        acc['avg'].append(m.get('avg', 0))
+        acc['med'].append(m.get('med', 0))
+        acc['p90'].append(m.get('p(90)', 0))
+        acc['p95'].append(m.get('p(95)', 0))
+        acc['p99'].append(m.get('p(99)', 0))
+    return {k: (sum(v) / len(v) if v else 0) for k, v in acc.items()}
+
 
 def load_throughput(filename):
-    filepath = os.path.join(RESULTS_DIR, filename)
-    with open(filepath, 'r') as f:
-        data = json.load(f)
-    metrics = data.get('metrics', {})
-    reqs = metrics.get('http_reqs', metrics.get('iterations', {}))
-    return reqs.get('rate', 0)
+    """Srednia przepustowosc z trzech przebiegow (iteracje na sekunde)."""
+    vals = []
+    for run in ALL_RUNS:
+        fn = filename.replace(ALL_RUNS[0], run)
+        m = _read(fn, 'iterations')
+        if m:
+            vals.append(m.get('rate', 0))
+    return sum(vals) / len(vals) if vals else 0
 
 # Color scheme
 COLORS = {
@@ -42,7 +60,7 @@ COLORS = {
 }
 
 PROTOCOLS = ['REST', 'gRPC-Web Envoy', 'gRPC-Web Direct', 'gRPC Native']
-TIMESTAMP = '20260805_122120'
+TIMESTAMP = ALL_RUNS[0]  # nazwy plikow buduje sie z pierwszego przebiegu; load_metric usrednia wszystkie
 
 plt.style.use('seaborn-v0_8-whitegrid')
 plt.rcParams['figure.dpi'] = 150
@@ -239,7 +257,7 @@ plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'chart_native_overhead.png'), bbox_inches='tight')
 print('Saved: chart_native_overhead.png')
 
-print('\n✓ All charts generated in:', OUTPUT_DIR)
+print('\n[OK] Charts generated in:', OUTPUT_DIR)
 
 
 # ============================================================
@@ -261,14 +279,8 @@ for i, protocol in enumerate(PROTOCOLS):
     else:
         m = load_metric(f'scenario-echo-rest_VU100_COUNT100_run1_{TIMESTAMP}-summary.json')
 
-    values = [m['med'], m.get('p90', 0), m['p95'], m['p99']]
-    # Load p90 separately since our helper doesn't grab it
-    filepath = os.path.join(RESULTS_DIR, f'scenario-echo-{"rest" if protocol == "REST" else "grpc-envoy" if protocol == "gRPC-Web Envoy" else "grpc-direct" if protocol == "gRPC-Web Direct" else "grpc-native"}_VU100_COUNT100_run1_{TIMESTAMP}-summary.json')
-    with open(filepath, 'r') as f:
-        raw = json.load(f)
-    metric_key = 'grpc_req_duration' if protocol == 'gRPC Native' else 'http_req_duration'
-    raw_m = raw['metrics'][metric_key]
-    values = [raw_m['med'], raw_m['p(90)'], raw_m['p(95)'], raw_m['p(99)']]
+    # load_metric zwraca juz srednie z trzech przebiegow, w tym p90
+    values = [m['med'], m['p90'], m['p95'], m['p99']]
 
     bars = ax.bar(x + i * width, values, width, label=protocol, color=COLORS[protocol])
 
@@ -351,4 +363,4 @@ plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, 'chart_orders_payload_impact.png'), bbox_inches='tight')
 print('Saved: chart_orders_payload_impact.png')
 
-print('\n✓ All 9 charts generated in:', OUTPUT_DIR)
+print('\n[OK] All 9 charts generated in:', OUTPUT_DIR)

@@ -1,0 +1,92 @@
+{
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "name": "status OK",
+                    "path": "::status OK",
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 144841,
+                    "fails": 0
+                },
+                "has order id": {
+                    "name": "has order id",
+                    "path": "::has order id",
+                    "id": "eaf29dffb3e9ddff3a846729d213593c",
+                    "passes": 144841,
+                    "fails": 0
+                }
+            }
+    },
+    "metrics": {
+        "checks": {
+            "fails": 0,
+            "passes": 289682,
+            "value": 1
+        },
+        "iterations": {
+            "count": 144841,
+            "rate": 1206.8802625791332
+        },
+        "vus_max": {
+            "value": 100,
+            "min": 100,
+            "max": 100
+        },
+        "grpc_native_orders_latency": {
+            "avg": 60.4459096526536,
+            "min": 4,
+            "med": 62,
+            "max": 262,
+            "p(90)": 94,
+            "p(95)": 106,
+            "p(99)": 134
+        },
+        "iteration_duration": {
+            "avg": 72.5235247942712,
+            "min": 14.368326,
+            "med": 73.732187,
+            "max": 272.677739,
+            "p(90)": 107.484123,
+            "p(95)": 119.895487,
+            "p(99)": 147.32573520000005
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 100
+        },
+        "data_received": {
+            "count": 66794849,
+            "rate": 556564.6805811445
+        },
+        "grpc_req_duration": {
+            "avg": 60.15039470449655,
+            "min": 4.023828,
+            "med": 61.463309,
+            "max": 262.137628,
+            "p(90)": 93.590995,
+            "p(95)": 105.818876,
+            "p(99)": 133.75002080000004,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "data_sent": {
+            "count": 57535702,
+            "rate": 479413.30933530396
+        },
+        "grpc_native_orders_errors": {
+            "passes": 0,
+            "fails": 144841,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        }
+    }
+}

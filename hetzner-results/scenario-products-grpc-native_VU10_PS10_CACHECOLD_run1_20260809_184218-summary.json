@@ -1,0 +1,173 @@
+{
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "name": "status OK",
+                    "path": "::status OK",
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 60211,
+                    "fails": 0
+                },
+                "has products": {
+                    "id": "bd20344dacb9319039907d7c96ed89b0",
+                    "passes": 60211,
+                    "fails": 0,
+                    "name": "has products",
+                    "path": "::has products"
+                }
+            }
+    },
+    "metrics": {
+        "http_req_connecting": {
+            "avg": 3.315552,
+            "min": 3.315552,
+            "med": 3.315552,
+            "max": 3.315552,
+            "p(90)": 3.315552,
+            "p(95)": 3.315552,
+            "p(99)": 3.315552
+        },
+        "http_req_tls_handshaking": {
+            "p(99)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "grpc_req_duration": {
+            "min": 1.37395,
+            "med": 2.991165,
+            "max": 84.197046,
+            "p(90)": 7.013098,
+            "p(95)": 52.429523,
+            "p(99)": 65.2941313,
+            "avg": 6.84500226674526,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "http_req_blocked": {
+            "max": 3.446726,
+            "p(90)": 3.446726,
+            "p(95)": 3.446726,
+            "p(99)": 3.446726,
+            "avg": 3.446726,
+            "min": 3.446726,
+            "med": 3.446726
+        },
+        "http_req_duration{expected_response:true}": {
+            "p(99)": 1.354614,
+            "avg": 1.354614,
+            "min": 1.354614,
+            "med": 1.354614,
+            "max": 1.354614,
+            "p(90)": 1.354614,
+            "p(95)": 1.354614
+        },
+        "data_sent": {
+            "count": 4506217,
+            "rate": 37546.4718933327
+        },
+        "http_req_receiving": {
+            "med": 0.079359,
+            "max": 0.079359,
+            "p(90)": 0.079359,
+            "p(95)": 0.079359,
+            "p(99)": 0.079359,
+            "avg": 0.079359,
+            "min": 0.079359
+        },
+        "http_req_duration": {
+            "p(90)": 1.354614,
+            "p(95)": 1.354614,
+            "p(99)": 1.354614,
+            "avg": 1.354614,
+            "min": 1.354614,
+            "med": 1.354614,
+            "max": 1.354614
+        },
+        "http_req_waiting": {
+            "max": 1.165349,
+            "p(90)": 1.165349,
+            "p(95)": 1.165349,
+            "p(99)": 1.165349,
+            "avg": 1.165349,
+            "min": 1.165349,
+            "med": 1.165349
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 1,
+            "value": 0
+        },
+        "iteration_duration": {
+            "p(95)": 63.1352185,
+            "p(99)": 76.14319450000005,
+            "avg": 17.507333146385168,
+            "min": 11.60572,
+            "med": 13.687273,
+            "max": 95.481635,
+            "p(90)": 17.736888
+        },
+        "grpc_native_products_latency": {
+            "med": 3,
+            "max": 85,
+            "p(90)": 7,
+            "p(95)": 53,
+            "p(99)": 66,
+            "avg": 7.014415970503729,
+            "min": 1
+        },
+        "data_received": {
+            "rate": 392097.07166144165,
+            "count": 47058336
+        },
+        "vus_max": {
+            "value": 10,
+            "min": 10,
+            "max": 10
+        },
+        "http_reqs": {
+            "rate": 0.008332149093870247,
+            "count": 1
+        },
+        "http_req_sending": {
+            "p(99)": 0.109906,
+            "avg": 0.109906,
+            "min": 0.109906,
+            "med": 0.109906,
+            "max": 0.109906,
+            "p(90)": 0.109906,
+            "p(95)": 0.109906
+        },
+        "grpc_native_products_errors": {
+            "passes": 0,
+            "fails": 60211,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "checks": {
+            "passes": 120422,
+            "fails": 0,
+            "value": 1
+        },
+        "iterations": {
+            "count": 60211,
+            "rate": 501.6870290910215
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 10
+        }
+    }
+}

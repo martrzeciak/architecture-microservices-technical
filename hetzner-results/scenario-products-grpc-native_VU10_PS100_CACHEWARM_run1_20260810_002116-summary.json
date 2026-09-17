@@ -1,0 +1,92 @@
+{
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "name": "status OK",
+                    "path": "::status OK",
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 79031,
+                    "fails": 0
+                },
+                "has products": {
+                    "name": "has products",
+                    "path": "::has products",
+                    "id": "bd20344dacb9319039907d7c96ed89b0",
+                    "passes": 79031,
+                    "fails": 0
+                }
+            }
+    },
+    "metrics": {
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 10
+        },
+        "grpc_native_products_errors": {
+            "passes": 0,
+            "fails": 79031,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "grpc_native_products_latency": {
+            "med": 2,
+            "max": 15,
+            "p(90)": 4,
+            "p(95)": 5,
+            "p(99)": 8,
+            "avg": 2.7737470106667006,
+            "min": 1
+        },
+        "iterations": {
+            "count": 79031,
+            "rate": 658.5512223579934
+        },
+        "grpc_req_duration": {
+            "med": 1.575607,
+            "max": 14.081908,
+            "p(90)": 3.307297,
+            "p(95)": 4.243464,
+            "p(99)": 6.5650596,
+            "avg": 1.9830026890840298,
+            "min": 0.878414,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "data_sent": {
+            "count": 5826684,
+            "rate": 48552.71818012884
+        },
+        "data_received": {
+            "count": 592212653,
+            "rate": 4934802.375384598
+        },
+        "checks": {
+            "passes": 158062,
+            "fails": 0,
+            "value": 1
+        },
+        "vus_max": {
+            "value": 10,
+            "min": 10,
+            "max": 10
+        },
+        "iteration_duration": {
+            "p(95)": 16.102692,
+            "p(99)": 18.362304699999996,
+            "avg": 13.331253879389042,
+            "min": 11.431428,
+            "med": 12.942224,
+            "max": 25.85322,
+            "p(90)": 15.117214
+        }
+    }
+}

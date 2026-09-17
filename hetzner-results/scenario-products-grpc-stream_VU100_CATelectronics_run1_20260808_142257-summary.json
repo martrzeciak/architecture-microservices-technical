@@ -1,0 +1,82 @@
+{
+    "root_group": {
+        "groups": {},
+        "checks": {
+                "no stream error": {
+                    "name": "no stream error",
+                    "path": "::no stream error",
+                    "id": "03be78e5feaa5702d0334ad91a07ff82",
+                    "passes": 457339,
+                    "fails": 0
+                }
+            },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "metrics": {
+        "data_received": {
+            "count": 297338589,
+            "rate": 2477623.4568161694
+        },
+        "vus_max": {
+            "value": 100,
+            "min": 100,
+            "max": 100
+        },
+        "grpc_req_duration": {
+            "med": 14.759316,
+            "max": 80.584455,
+            "p(90)": 32.360486,
+            "p(95)": 38.991147999999995,
+            "avg": 17.11852700788203,
+            "min": 0.923307,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        },
+        "grpc_streams_msgs_received": {
+            "count": 3658712,
+            "rate": 30486.8288486255
+        },
+        "iterations": {
+            "count": 457339,
+            "rate": 3810.8536060781876
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 100
+        },
+        "grpc_stream_errors": {
+            "fails": 457339,
+            "passes": 0,
+            "value": 0
+        },
+        "checks": {
+            "passes": 457339,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_streams_msgs_sent": {
+            "count": 457339,
+            "rate": 3810.8536060781876
+        },
+        "data_sent": {
+            "rate": 321393.11711152137,
+            "count": 38570258
+        },
+        "iteration_duration": {
+            "p(90)": 41.493892,
+            "p(95)": 48.137604,
+            "avg": 22.953927684190663,
+            "min": 10.06754,
+            "med": 19.307754,
+            "max": 104.671788
+        },
+        "grpc_streams": {
+            "count": 457339,
+            "rate": 3810.8536060781876
+        }
+    }
+}

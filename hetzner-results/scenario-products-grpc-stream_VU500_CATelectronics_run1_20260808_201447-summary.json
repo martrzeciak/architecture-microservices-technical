@@ -1,0 +1,82 @@
+{
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "no stream error": {
+                    "passes": 455458,
+                    "fails": 0,
+                    "name": "no stream error",
+                    "path": "::no stream error",
+                    "id": "03be78e5feaa5702d0334ad91a07ff82"
+                }
+            }
+    },
+    "metrics": {
+        "checks": {
+            "passes": 455458,
+            "fails": 0,
+            "value": 1
+        },
+        "grpc_stream_errors": {
+            "passes": 0,
+            "fails": 455458,
+            "value": 0
+        },
+        "vus": {
+            "max": 500,
+            "value": 21,
+            "min": 15
+        },
+        "grpc_req_duration": {
+            "med": 78.72665,
+            "max": 482.821748,
+            "p(90)": 184.2352311,
+            "p(95)": 213.6649148999999,
+            "avg": 92.84037197969,
+            "min": 1.034407,
+            "thresholds": {
+                "p(95)<30000": false
+            }
+        },
+        "grpc_streams_msgs_received": {
+            "rate": 30361.995046265984,
+            "count": 3643664
+        },
+        "vus_max": {
+            "value": 500,
+            "min": 500,
+            "max": 500
+        },
+        "grpc_streams": {
+            "count": 455458,
+            "rate": 3795.249380783248
+        },
+        "data_sent": {
+            "count": 38420759,
+            "rate": 320153.2562914086
+        },
+        "iteration_duration": {
+            "avg": 109.4550167712918,
+            "min": 10.089593,
+            "med": 94.08247,
+            "max": 514.269452,
+            "p(90)": 208.9247881,
+            "p(95)": 239.2060433999999
+        },
+        "iterations": {
+            "count": 455458,
+            "rate": 3795.249380783248
+        },
+        "grpc_streams_msgs_sent": {
+            "count": 455458,
+            "rate": 3795.249380783248
+        },
+        "data_received": {
+            "count": 297194472,
+            "rate": 2476467.941786519
+        }
+    }
+}

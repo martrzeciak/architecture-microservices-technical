@@ -1,0 +1,419 @@
+{
+  "test": "browser-benchmark",
+  "timestamp": "2026-08-16T13-36-44",
+  "config": {
+    "frontend_url": "http://localhost:4200",
+    "page_sizes": [],
+    "cache_states": [],
+    "order_items": [],
+    "echo_sizes": [
+      200,
+      2000
+    ],
+    "vu_list": [
+      10
+    ],
+    "max_vu_rows": 25000,
+    "max_vu_items": 5000,
+    "skipped_cells": [],
+    "iterations_per_vu": 20,
+    "runs": 2,
+    "cooldown_sec": 5,
+    "warmup_requests_per_protocol": 20,
+    "prime_requests_per_worker": 3,
+    "think_time_ms": "adaptacyjny — per komorka, patrz cells[].think_time_ms",
+    "link_mbps": 245,
+    "uplink_mbps": 20,
+    "link_budget": 0.5,
+    "rotation": "latin_square",
+    "measurement": "click -> DOM updated (in-page performance.now)",
+    "not_reproducible_in_browser": [
+      "grpc_native",
+      "grpc_native_streaming"
+    ]
+  },
+  "cells": {
+    "echo_VU10_N200": {
+      "scenario": "echo",
+      "vu": 10,
+      "think_time_ms": 100,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 28.2,
+            "avg": 33.2,
+            "avg_excl_stalls": 33.2,
+            "stalls_excluded": 0,
+            "med": 33.2,
+            "p90": 35.8,
+            "p95": 36.6,
+            "p99": 38.2,
+            "max": 40
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 28.3,
+              "avg": 32.8,
+              "avg_excl_stalls": 32.8,
+              "stalls_excluded": 0,
+              "med": 32.9,
+              "p90": 35.4,
+              "p95": 35.7,
+              "p99": 36.7,
+              "max": 37.5,
+              "throughput_rps": 43.4,
+              "total_duration_sec": 4.6,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            },
+            {
+              "count": 200,
+              "min": 28.2,
+              "avg": 33.6,
+              "avg_excl_stalls": 33.6,
+              "stalls_excluded": 0,
+              "med": 33.7,
+              "p90": 36.6,
+              "p95": 37.4,
+              "p99": 38.9,
+              "max": 40,
+              "throughput_rps": 42.9,
+              "total_duration_sec": 4.7,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              32.9,
+              33.7
+            ],
+            "sd": 0.6,
+            "cv": 1.7
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 28.9,
+            "avg": 32.5,
+            "avg_excl_stalls": 32.5,
+            "stalls_excluded": 0,
+            "med": 32.5,
+            "p90": 34.6,
+            "p95": 35.2,
+            "p99": 37.2,
+            "max": 39
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 28.9,
+              "avg": 32.4,
+              "avg_excl_stalls": 32.4,
+              "stalls_excluded": 0,
+              "med": 32.4,
+              "p90": 34.2,
+              "p95": 34.9,
+              "p99": 37.8,
+              "max": 38.2,
+              "throughput_rps": 43.3,
+              "total_duration_sec": 4.6,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            },
+            {
+              "count": 200,
+              "min": 28.9,
+              "avg": 32.7,
+              "avg_excl_stalls": 32.7,
+              "stalls_excluded": 0,
+              "med": 32.6,
+              "p90": 34.7,
+              "p95": 35.5,
+              "p99": 37.2,
+              "max": 39,
+              "throughput_rps": 43.9,
+              "total_duration_sec": 4.6,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              32.4,
+              32.6
+            ],
+            "sd": 0.1,
+            "cv": 0.4
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 27,
+            "avg": 30.7,
+            "avg_excl_stalls": 30.7,
+            "stalls_excluded": 0,
+            "med": 30.6,
+            "p90": 33.6,
+            "p95": 34.4,
+            "p99": 35.6,
+            "max": 36
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 27.3,
+              "avg": 30.4,
+              "avg_excl_stalls": 30.4,
+              "stalls_excluded": 0,
+              "med": 30.5,
+              "p90": 32.9,
+              "p95": 33.8,
+              "p99": 34.8,
+              "max": 35.4,
+              "throughput_rps": 41.9,
+              "total_duration_sec": 4.8,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            },
+            {
+              "count": 200,
+              "min": 27,
+              "avg": 30.9,
+              "avg_excl_stalls": 30.9,
+              "stalls_excluded": 0,
+              "med": 30.8,
+              "p90": 34.3,
+              "p95": 35,
+              "p99": 35.6,
+              "max": 36,
+              "throughput_rps": 42.7,
+              "total_duration_sec": 4.7,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              30.5,
+              30.8
+            ],
+            "sd": 0.2,
+            "cv": 0.7
+          }
+        }
+      },
+      "echo_size": 200
+    },
+    "echo_VU10_N2000": {
+      "scenario": "echo",
+      "vu": 10,
+      "think_time_ms": 236,
+      "protocols": {
+        "rest": {
+          "label": "REST",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 151,
+            "avg": 168,
+            "avg_excl_stalls": 168,
+            "stalls_excluded": 0,
+            "med": 167.8,
+            "p90": 179.8,
+            "p95": 183.3,
+            "p99": 193.8,
+            "max": 203.9
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 153.1,
+              "avg": 168.4,
+              "avg_excl_stalls": 168.4,
+              "stalls_excluded": 0,
+              "med": 170.2,
+              "p90": 179.7,
+              "p95": 181.9,
+              "p99": 187.2,
+              "max": 195.2,
+              "throughput_rps": 18.8,
+              "total_duration_sec": 10.7,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            },
+            {
+              "count": 200,
+              "min": 151,
+              "avg": 167.6,
+              "avg_excl_stalls": 167.6,
+              "stalls_excluded": 0,
+              "med": 166.3,
+              "p90": 181.5,
+              "p95": 184.4,
+              "p99": 194.7,
+              "max": 203.9,
+              "throughput_rps": 18.9,
+              "total_duration_sec": 10.6,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              170.2,
+              166.3
+            ],
+            "sd": 2.8,
+            "cv": 1.6
+          }
+        },
+        "grpc_web_envoy": {
+          "label": "gRPC-Web (Envoy)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 109.4,
+            "avg": 122.8,
+            "avg_excl_stalls": 122.8,
+            "stalls_excluded": 0,
+            "med": 120.9,
+            "p90": 136.4,
+            "p95": 139.5,
+            "p99": 148.8,
+            "max": 157.9
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 109.4,
+              "avg": 123.2,
+              "avg_excl_stalls": 123.2,
+              "stalls_excluded": 0,
+              "med": 121.7,
+              "p90": 135.1,
+              "p95": 139,
+              "p99": 148.2,
+              "max": 148.8,
+              "throughput_rps": 21.1,
+              "total_duration_sec": 9.5,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            },
+            {
+              "count": 200,
+              "min": 110,
+              "avg": 122.4,
+              "avg_excl_stalls": 122.4,
+              "stalls_excluded": 0,
+              "med": 120,
+              "p90": 137.2,
+              "p95": 140.6,
+              "p99": 152.8,
+              "max": 157.9,
+              "throughput_rps": 21,
+              "total_duration_sec": 9.5,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              121.7,
+              120
+            ],
+            "sd": 1.2,
+            "cv": 1
+          }
+        },
+        "grpc_web_direct": {
+          "label": "gRPC-Web (Direct)",
+          "total_measurements": 400,
+          "errors": 0,
+          "stats": {
+            "count": 400,
+            "min": 106.3,
+            "avg": 182.4,
+            "avg_excl_stalls": 118.3,
+            "stalls_excluded": 10,
+            "med": 115.7,
+            "p90": 132.7,
+            "p95": 143,
+            "p99": 2695.9,
+            "max": 2743.7
+          },
+          "per_run": [
+            {
+              "count": 200,
+              "min": 107.8,
+              "avg": 248,
+              "avg_excl_stalls": 119.9,
+              "stalls_excluded": 10,
+              "med": 118.1,
+              "p90": 139,
+              "p95": 2629.5,
+              "p99": 2728,
+              "max": 2743.7,
+              "throughput_rps": 16.1,
+              "total_duration_sec": 12.4,
+              "errors": 0,
+              "stall_count": 10,
+              "stall_rate_pct": 5
+            },
+            {
+              "count": 200,
+              "min": 106.3,
+              "avg": 116.7,
+              "avg_excl_stalls": 116.7,
+              "stalls_excluded": 0,
+              "med": 114.3,
+              "p90": 131.1,
+              "p95": 133.1,
+              "p99": 158.1,
+              "max": 168.8,
+              "throughput_rps": 20.8,
+              "total_duration_sec": 9.6,
+              "errors": 0,
+              "stall_count": 0,
+              "stall_rate_pct": 0
+            }
+          ],
+          "inter_run": {
+            "medians": [
+              118.1,
+              114.3
+            ],
+            "sd": 2.7,
+            "cv": 2.3
+          }
+        }
+      },
+      "echo_size": 2000
+    }
+  }
+}

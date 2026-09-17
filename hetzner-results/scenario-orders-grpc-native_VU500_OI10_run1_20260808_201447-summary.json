@@ -1,0 +1,92 @@
+{
+    "metrics": {
+        "iterations": {
+            "count": 151475,
+            "rate": 1262.119100582354
+        },
+        "grpc_native_orders_latency": {
+            "p(95)": 459,
+            "p(99)": 505,
+            "avg": 334.60306981350055,
+            "min": 4,
+            "med": 362,
+            "max": 662,
+            "p(90)": 436
+        },
+        "data_received": {
+            "count": 71282747,
+            "rate": 593941.6836486515
+        },
+        "iteration_duration": {
+            "avg": 346.94060735781864,
+            "min": 15.084566,
+            "med": 373.848122,
+            "max": 675.791743,
+            "p(90)": 448.7854838,
+            "p(95)": 472.06339089999994,
+            "p(99)": 519.1400767800002
+        },
+        "grpc_req_duration": {
+            "med": 361.322376,
+            "max": 662.021105,
+            "p(90)": 435.30798280000005,
+            "p(95)": 458.7879389,
+            "p(99)": 504.5918754000001,
+            "avg": 334.3129222592416,
+            "min": 4.40417,
+            "thresholds": {
+                "p(95)<5000": false,
+                "p(99)<10000": false
+            }
+        },
+        "data_sent": {
+            "count": 60309621,
+            "rate": 502511.4679847014
+        },
+        "vus": {
+            "max": 500,
+            "value": 20,
+            "min": 16
+        },
+        "vus_max": {
+            "value": 500,
+            "min": 500,
+            "max": 500
+        },
+        "grpc_native_orders_errors": {
+            "passes": 0,
+            "fails": 151475,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "checks": {
+            "fails": 0,
+            "passes": 302950,
+            "value": 1
+        }
+    },
+    "root_group": {
+        "groups": {},
+        "checks": {
+                "status OK": {
+                    "name": "status OK",
+                    "path": "::status OK",
+                    "id": "8f59c0efd244e6b5c27a2bbb17f839cf",
+                    "passes": 151475,
+                    "fails": 0
+                },
+                "has order id": {
+                    "id": "eaf29dffb3e9ddff3a846729d213593c",
+                    "passes": 151475,
+                    "fails": 0,
+                    "name": "has order id",
+                    "path": "::has order id"
+                }
+            },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+}
